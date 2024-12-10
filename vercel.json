@@ -6,6 +6,7 @@
 			"use": "@vercel/python"
 		}
 	],
+	"buildCommand": "cd frontend && npm run build",
 	"routes": [
 		{
 			"src": "/(.*)",
