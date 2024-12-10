@@ -20,9 +20,9 @@ default_length, default_uppercase, default_numbers, default_specialchars = (
 # initialise the flask application
 app = Flask(
     __name__,
-    static_folder=path + "../frontend/dist",
+    static_folder=path + "/../frontend/dist",
     static_url_path="/",
-    template_folder=path + "../frontend/dist",
+    template_folder=path + "/../frontend/dist",
 )
 
 
