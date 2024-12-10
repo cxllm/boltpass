@@ -2,7 +2,8 @@ import sys
 import os
 
 # to ensure that the vercel deployment works
-sys.path.insert(1, os.path.dirname(os.path.realpath(__file__)))
+path = os.path.dirname(os.path.realpath(__file__))
+sys.path.insert(1, path)
 
 from flask import Flask, request, jsonify, render_template
 from util.generate_password import (
@@ -19,9 +20,9 @@ default_length, default_uppercase, default_numbers, default_specialchars = (
 # initialise the flask application
 app = Flask(
     __name__,
-    static_folder="../frontend/dist",
+    static_folder=path + "../frontend/dist",
     static_url_path="/",
-    template_folder="../frontend/dist",
+    template_folder=path + "../frontend/dist",
 )
 
 
