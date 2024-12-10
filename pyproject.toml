@@ -1,0 +1,15 @@
+[tool.poetry]
+name = "nea-boltpass"
+version = "0.1.0"
+description = "A password manager project for my NEA"
+authors = ["cxllm"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.13"
+flask = "^3.1.0"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
