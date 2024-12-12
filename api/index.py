@@ -12,7 +12,6 @@ from util.generate_password import (
     LengthTooHighError,
 )
 
-print()
 default_length, default_uppercase, default_numbers, default_specialchars = (
     password_generator.__defaults__
 )
@@ -28,9 +27,13 @@ app = Flask(
 
 
 @app.get("/")
-@app.errorhandler(404)
 def root():
     # the root function sends all requests at the root or an unknown page to react, which will handle it from there
+    return render_template("index.html")
+
+
+@app.errorhandler(404)
+def not_found(_=None):
     return render_template("index.html")
 
 
@@ -81,3 +84,7 @@ def generate_password():
     except LengthTooHighError:
         # return an error if it is too long
         return jsonify({"error": "The length of the password was too long"})
+
+
+if __name__ == "__main__":
+    app.run(port=3000)
