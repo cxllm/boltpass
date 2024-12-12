@@ -12,6 +12,7 @@ from util.generate_password import (
     LengthTooHighError,
 )
 
+print()
 default_length, default_uppercase, default_numbers, default_specialchars = (
     password_generator.__defaults__
 )
@@ -80,7 +81,3 @@ def generate_password():
     except LengthTooHighError:
         # return an error if it is too long
         return jsonify({"error": "The length of the password was too long"})
-
-
-if __name__ == "__main__":
-    app.run(port=3000)
