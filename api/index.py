@@ -6,11 +6,13 @@ path = os.path.dirname(os.path.realpath(__file__))
 sys.path.insert(1, path)
 
 from flask import Flask, request, jsonify, render_template
+from flask_cors import CORS
 from util.generate_password import (
     password_generator,
     LengthTooLowError,
     LengthTooHighError,
 )
+
 
 default_length, default_uppercase, default_numbers, default_specialchars = (
     password_generator.__defaults__
@@ -24,7 +26,7 @@ app = Flask(
     static_url_path="/",
     template_folder=path + "/../frontend/dist",
 )
-
+CORS(app)
 
 @app.get("/")
 def root():

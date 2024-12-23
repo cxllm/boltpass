@@ -1,15 +1,16 @@
-import { Link } from "react-router";
-
-function NotFound() {
+function NotFound(props: { dark: boolean }) {
 	return (
 		<>
-			<div>
-				<Link to="/">
-					<img src="/Bolt%20Pass%20Dark.png" className="logo" alt="Vite logo" />
-				</Link>
-			</div>
+			<img
+				src={`/Bolt%20Pass%20${props.dark ? "Light" : "Dark"}.png`}
+				className="logo"
+				alt="BoltPass logo"
+			/>
 			<h1>Page Not Found</h1>
-			<Link to="../">Go back</Link>
+			<p className="not-found">
+				The page {window.location.pathname} was not found on the server{" "}
+				<a href="/">{"<<"} Go back home</a>
+			</p>
 		</>
 	);
 }
