@@ -2,7 +2,7 @@ function Home(props: { dark: boolean }) {
 	return (
 		<>
 			<img
-				src={`/Bolt%20Pass%20${props.dark ? "Light" : "Dark"}.png`}
+				src={`/bolt-pass-${props.dark ? "light" : "dark"}.png`}
 				className="logo"
 				alt="BoltPass logo"
 			/>
