@@ -17,7 +17,6 @@ export default class Navigation extends Component<
 		if (this.state.pathname == "") {
 			this.setState({ pathname: window.location.pathname });
 		}
-		console.log(this.state.pathname);
 		return (
 			<>
 				<Navbar

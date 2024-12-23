@@ -15,7 +15,6 @@ function App() {
 	const darkMode = () => {
 		const string = window.localStorage.getItem("dark");
 		let enabled = !(string == "false");
-		console.log(enabled);
 		enabled = !enabled;
 		setDark(enabled);
 		window.localStorage.setItem("dark", enabled.toString());
