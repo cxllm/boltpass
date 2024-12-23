@@ -42,7 +42,6 @@ export default class Navigation extends Component<
 							activeKey={this.state.pathname}
 							defaultActiveKey="/"
 							onSelect={(selectedKey) => {
-								console.log(selectedKey);
 								this.setState({ pathname: selectedKey || "/" });
 							}}
 						>
@@ -54,7 +53,7 @@ export default class Navigation extends Component<
 								className="brand"
 							>
 								<img
-									src="/Bolt%20Pass%20Light.png"
+									src="/bolt-pass-light.png"
 									width="30"
 									height="30"
 									className="d-inline-block align-top"
