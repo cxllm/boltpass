@@ -2,14 +2,16 @@ import string
 import secrets
 import random
 
-max_length = 200
+MAX_LENGTH = 200
 
 
 class LengthTooHighError(Exception):
+    # error for when the length requested is too long
     pass
 
 
 class LengthTooLowError(Exception):
+    # error for when the length requests is too short
     pass
 
 
@@ -41,10 +43,11 @@ def password_generator(
         + (secrets.choice(digits) if incl_numbers else "")
         + (secrets.choice(special_chars) if incl_special_chars else "")
     )
-    # if the password is not long enough (lower than the amount of )
+    # if the password is not long enough (lower than the amount of mandatory characters)
     if len(mandatory) > length:
         raise LengthTooLowError
-    elif length > max_length:
+    # if the password requested is too long
+    elif length > MAX_LENGTH:
         raise LengthTooHighError
 
     # generate a random password
@@ -59,5 +62,6 @@ def password_generator(
     return password
 
 
+# only run this if the file is being called directly and not imported (only for testing purposes)
 if __name__ == "__main__":
     print(password_generator())

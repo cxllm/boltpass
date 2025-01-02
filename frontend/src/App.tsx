@@ -9,23 +9,33 @@ import Navbar from "./Components/Navbar";
 import { useState } from "react";
 function App() {
 	const [dark, setDark] = useState(
-		window.localStorage.getItem("dark") != "false"
+		// set the "dark" state to the exisiting element in local storage or true if it doesn't exist
+		!(window.localStorage.getItem("dark") == "false")
 	);
-	console.log(dark);
 	const darkMode = () => {
-		const string = window.localStorage.getItem("dark");
-		let enabled = !(string == "false");
-		enabled = !enabled;
-		setDark(enabled);
-		window.localStorage.setItem("dark", enabled.toString());
+		// function to update the darkMode prefernces
+		const string = window.localStorage.getItem("dark"); // check if dark mode preferences already exist.
+		let enabled = !(string == "false"); // if they don't exist, set by default to true
+		enabled = !enabled; // reverse the dark mode preference
+		setDark(enabled); // update it in react state
+		window.localStorage.setItem("dark", enabled.toString()); // update it in local storage
 	};
 	return (
 		<>
 			<BrowserRouter>
+				{" "}
+				{/* set up the router allowing for different elements to be rendered depending on the path */}
 				<div className={"app " + (dark ? "dark" : "light")}>
-					<Navbar setDark={darkMode} dark={dark} />
+					{" "}
+					{/* set to dark or light mode depending on the state */}
+					<Navbar setDark={darkMode} dark={dark} />{" "}
+					{/* The elements contained with the router act as a template for each page, so each page will include the navbar */}
 					<div className="content">
+						{" "}
+						{/* each page will be contained within the content class which has specific stylings for the content of the page */}
 						<Routes>
+							{" "}
+							{/* Instructs which element to render based on the path entered */}
 							<Route path="/" element=<Home dark={dark} /> />
 							<Route
 								path="/password-generator"

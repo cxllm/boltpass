@@ -13,11 +13,10 @@ from util.generate_password import (
     LengthTooHighError,
 )
 
-
+# gets default values from the password generator function
 default_length, default_uppercase, default_numbers, default_specialchars = (
     password_generator.__defaults__
 )
-
 
 # initialise the flask application
 app = Flask(
@@ -26,16 +25,19 @@ app = Flask(
     static_url_path="/",
     template_folder=path + "/../frontend/dist",
 )
+# Initliases CORS (Cross-Origin Resource Sharing) which allows the backend to be used within the frontend
 CORS(app)
+
 
 @app.get("/")
 def root():
-    # the root function sends all requests at the root or an unknown page to react, which will handle it from there
+    # the root function sends the request to the frontend where it is handled accordingly
     return render_template("index.html")
 
 
 @app.errorhandler(404)
 def not_found(_=None):
+    # Sends all pages that aren't covered by the backend to the frontend where it is handled accordingly
     return render_template("index.html")
 
 
@@ -88,5 +90,6 @@ def generate_password():
         return jsonify({"error": "The length of the password was too long"})
 
 
+# only run if the file is being called directly
 if __name__ == "__main__":
     app.run(port=3000)
