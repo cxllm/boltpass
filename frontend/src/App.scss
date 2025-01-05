@@ -5,8 +5,30 @@
 	--light-blue: #01abfe;
 	--green: #0f6;
 	--red: #f03;
-	--font: Inter;
-} // setting default colours and font, allowing for them to be easily changed as they don't need to be repeated
+	--font: Inter; // setting default colours and font, allowing for them to be easily changed as they don't need to be repeated
+
+	// the settings below form part of the default CSS configuration when you set up a React application as they ensure that
+	// the website can be rendered on all devices and browsers, if they don't support things such as outside fonts
+	font-family: var(--font), -apple-system, BlinkMacSystemFont, "Segoe UI",
+		"Roboto", "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans",
+		"Helvetica Neue", sans-serif; // ensuring there will always be a fallback font in case the imported one doesn't work
+	line-height: 1.5;
+	font-weight: 400; // default font settings
+
+	background-color: var(--dark-bg);
+	color-scheme: light dark; // the website can be viewed in dark mode or light mode
+	color: #fff;
+
+	font-synthesis: none; // browser configuration information for the website
+	text-rendering: optimizeLegibility;
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
+}
+
+body {
+	margin: 0;
+}
+
 .app {
 	font-family: var(--font);
 	min-height: 100vh; // 100vh means it will fill the whole screen's height (vh = view height)
@@ -16,13 +38,15 @@
 	text-align: center;
 	word-wrap: break-word; // if the text is too long it wraps onto the next line
 	.content {
+		margin-bottom: 1vh; // if the content is longer than the page, this adds some space between the bottom of the page and the content
 		width: 60%;
-		margin-left: auto;
+		margin-left: auto; // centres content on the page
 		margin-right: auto;
 		min-height: 84vh; // accounts for height of navbar
 		display: flex;
 		flex-direction: column;
 		justify-content: center;
+
 		button {
 			// only styles the button within the content class so as not to interfere with navbar
 			width: fit-content;
@@ -37,6 +61,7 @@
 			margin-left: auto;
 			margin-right: auto;
 		}
+
 		button:disabled {
 			background-color: red;
 			color: #fff8;
@@ -51,22 +76,27 @@
 		width: 100%;
 		color: #fff;
 		background-color: var(--dark-blue);
+
 		a {
 			color: #fffa !important;
 		}
+
 		a.active {
 			color: #fff !important;
 		}
+
 		a:hover {
 			color: #fffd !important;
 		}
 	}
+
 	form.login {
 		width: 50vw;
 		text-align: left;
 		margin-left: auto;
 		margin-right: auto;
 		display: grid;
+
 		input[type="text"],
 		input[type="password"],
 		input[type="email"] {
@@ -78,9 +108,11 @@
 			border-radius: 5px;
 			background-color: var(--dark-blue);
 		}
+
 		input::placeholder {
 			color: #fff7;
 		}
+
 		input[type="text"]:focus {
 			border: 2px solid red;
 		}
@@ -91,6 +123,7 @@
 		width: fit-content;
 		margin-left: auto;
 		margin-right: auto;
+
 		label {
 			font-size: 1.5rem;
 			font-weight: 400;
@@ -101,6 +134,7 @@
 			gap: 0.5rem;
 			padding: 1px 0;
 		}
+
 		label.slider {
 			// give enough space for a slider
 			grid-template-columns: 12.5rem auto;
@@ -111,6 +145,7 @@
 		// fixes margins on the password generator page
 		margin: 0.5rem;
 	}
+
 	@media screen and (max-width: 1000px) {
 		// modifies styles for mobile devices
 		.content {
@@ -118,14 +153,17 @@
 			width: 90vw;
 			min-height: 85vh;
 		}
+
 		.nav {
 			// doesn't limit navbar height as it expands with responsive design
 			height: fit-content;
 		}
+
 		.brand {
 			// get rid of the logo in the navbar
 			display: none;
 		}
+
 		form.login {
 			width: 90vw;
 		}
@@ -136,17 +174,15 @@
 	// dark mode theme
 	background-color: var(--dark-bg);
 	color: white;
-	a {
-		color: var(--light-blue);
-	}
 }
 .app.light {
 	// light mode theme
 	background-color: #fff;
 	color: var(--dark-bg);
-	a {
-		color: var(--light-blue);
-	}
+}
+
+a {
+	color: var(--light-blue);
 }
 
 .logo {
@@ -166,4 +202,13 @@
 
 .green {
 	color: var(--green);
+}
+
+h1 {
+	text-align: center;
+	font-weight: 800;
+}
+
+p {
+	font-size: large;
 }

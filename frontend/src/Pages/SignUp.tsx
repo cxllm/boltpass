@@ -20,7 +20,7 @@ function SignUp(props: { dark: boolean }) {
 	const [passwordVerification, setPasswordVerification] = useState("");
 
 	const signUp = () => {
-		// "PLACEHOLDER UNTIL FUNCTION IS COMPLETED
+		// PLACEHOLDER UNTIL FUNCTION IS COMPLETED
 		console.log("Submitted Information: ");
 		console.log("Email Address:", email);
 		console.log("Password:", password);
