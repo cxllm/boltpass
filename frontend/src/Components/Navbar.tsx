@@ -75,9 +75,20 @@ export default class Navigation extends Component<
 								Password Generator
 							</Nav.Link>
 						</Nav>
-						<Nav style={{ paddingRight: "10px" }}>
-							<Nav.Link as={Link} to="/login">
+						<Nav
+							style={{ paddingRight: "10px" }}
+							activeKey={this.state.pathname}
+							defaultActiveKey="/"
+							onSelect={(selectedKey) => {
+								// updates the current pathname when a link is pressed (only works when a Nav.Link is pressed)
+								this.setState({ pathname: selectedKey || "/" });
+							}}
+						>
+							<Nav.Link eventKey="/login" as={Link} to="/login">
 								Login
+							</Nav.Link>{" "}
+							<Nav.Link eventKey="/sign-up" as={Link} to="/sign-up">
+								Sign Up
 							</Nav.Link>{" "}
 						</Nav>
 						<Nav>

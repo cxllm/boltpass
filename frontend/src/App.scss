@@ -2,6 +2,9 @@
 :root {
 	--dark-blue: #13587c;
 	--dark-bg: #202124;
+	--light-blue: #01abfe;
+	--green: #0f6;
+	--red: #f03;
 	--font: Inter;
 } // setting default colours and font, allowing for them to be easily changed as they don't need to be repeated
 .app {
@@ -34,6 +37,11 @@
 			margin-left: auto;
 			margin-right: auto;
 		}
+		button:disabled {
+			background-color: red;
+			color: #fff8;
+			cursor: not-allowed;
+		}
 	}
 
 	.nav {
@@ -53,7 +61,31 @@
 			color: #fffd !important;
 		}
 	}
-	.password-generator {
+	form.login {
+		width: 50vw;
+		text-align: left;
+		margin-left: auto;
+		margin-right: auto;
+		display: grid;
+		input[type="text"],
+		input[type="password"],
+		input[type="email"] {
+			padding: 10px 20px;
+			margin: 8px 0;
+			display: inline-block;
+			box-sizing: border-box;
+			border: solid var(--dark-blue) 2px;
+			border-radius: 5px;
+			background-color: var(--dark-blue);
+		}
+		input::placeholder {
+			color: #fff7;
+		}
+		input[type="text"]:focus {
+			border: 2px solid red;
+		}
+	}
+	form.password-generator {
 		// layout for the form to generate a password
 		text-align: left;
 		width: fit-content;
@@ -74,6 +106,7 @@
 			grid-template-columns: 12.5rem auto;
 		}
 	}
+
 	h2.generator {
 		// fixes margins on the password generator page
 		margin: 0.5rem;
@@ -93,6 +126,9 @@
 			// get rid of the logo in the navbar
 			display: none;
 		}
+		form.login {
+			width: 90vw;
+		}
 	}
 }
 
@@ -100,11 +136,17 @@
 	// dark mode theme
 	background-color: var(--dark-bg);
 	color: white;
+	a {
+		color: var(--light-blue);
+	}
 }
 .app.light {
 	// light mode theme
 	background-color: #fff;
 	color: var(--dark-bg);
+	a {
+		color: var(--light-blue);
+	}
 }
 
 .logo {
@@ -116,4 +158,12 @@
 
 .not-found {
 	text-align: center;
+}
+
+.red {
+	color: var(--red);
+}
+
+.green {
+	color: var(--green);
 }

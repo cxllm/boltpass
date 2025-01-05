@@ -31,8 +31,7 @@ function PasswordGenerator(props: { dark: boolean }) {
 	return (
 		<>
 			<img
-				// pick which logo to use based on the theme chosen
-
+				// pick which logo to use based on the theme chosenW
 				src={`/bolt-pass-${props.dark ? "light" : "dark"}.png`}
 				className="logo"
 				alt="BoltPass logo"
