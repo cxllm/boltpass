@@ -1,9 +1,12 @@
 import sys
 import os
+import json
+import re
 
 # to ensure that the vercel deployment works
 path = os.path.dirname(os.path.realpath(__file__))
 sys.path.insert(1, path)
+
 
 from flask import Flask, request, jsonify, render_template
 from flask_cors import CORS
@@ -12,11 +15,16 @@ from util.generate_password import (
     LengthTooLowError,
     LengthTooHighError,
 )
+from util.password_hashing import generate_hash, verify_password
 
 # gets default values from the password generator function
 default_length, default_uppercase, default_numbers, default_specialchars = (
     password_generator.__defaults__
 )
+# Regex to verify if the email is valid
+emailRegex = r"^[a-zA-Z0-9.!#$%&’*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$"
+# Regex to verify if password is secure
+passwordRegex = "^(?=.*[0-9])(?=.*[A-Z])(?=.*[a-z])(?=.*[^0-9A-Za-z]).{8,}$"
 
 # initialise the flask application
 app = Flask(
@@ -88,6 +96,42 @@ def generate_password():
     except LengthTooHighError:
         # return an error if it is too long
         return jsonify({"error": "The length of the password was too long"})
+
+
+@app.post("/api/sign-up")
+def sign_up():
+    data = json.loads(request.data)
+    if not ("email" in data.keys() and "password" in data.keys()):
+        return jsonify(
+            {
+                "error": "MISSING_DATA",
+                "text": "Both username and password need to be included in the post request",
+            }
+        )
+    email = data["email"]
+    password = data["password"]
+    if not re.match(emailRegex, email):
+        return jsonify({"error": "INVALID_EMAIL", "text": "Email entered is invalid"})
+    if not re.match(passwordRegex, password):
+        return jsonify(
+            {"error": "INVALID_PASSWORD", "text": "Password is not secure enough"}
+        )
+    # INCLUDE CODE HERE WHEN DATABASE IS IMPLEMENTED:
+    # if EMAIL IS ALREADY IN USE:
+    #   return jsonify(
+    #       {"error": "EMAIL_IN_USE", "text": "Email is already in use"}
+    #   )
+
+    # Database is not yet implemented so this is acting as a placeholder until then
+    hashed_password, salt = generate_hash(password)
+    data = {
+        "email": email,
+        "password": password,
+        "hashed_password": hashed_password,
+        "salt": salt,
+    }
+    print(data)
+    return jsonify(data)
 
 
 # only run if the file is being called directly

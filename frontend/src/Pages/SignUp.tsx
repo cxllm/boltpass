@@ -21,6 +21,18 @@ function SignUp(props: { dark: boolean }) {
 
 	const signUp = () => {
 		// PLACEHOLDER UNTIL FUNCTION IS COMPLETED
+		fetch("http://localhost:3000/api/sign-up", {
+			method: "POST",
+			body: JSON.stringify({
+				email: email,
+				password: password
+			}),
+			headers: {
+				"Content-Type": "application/json"
+			}
+		})
+			.then((r) => r.json())
+			.then(console.log);
 		console.log("Submitted Information: ");
 		console.log("Email Address:", email);
 		console.log("Password:", password);

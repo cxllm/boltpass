@@ -17,7 +17,7 @@ class LengthTooLowError(Exception):
 
 def password_generator(
     length=20, incl_uppercase=True, incl_numbers=True, incl_special_chars=True
-):
+) -> str:
     """
     Generates a random secure password
 
@@ -28,7 +28,7 @@ def password_generator(
             incl_special_chars (bool): Whether or not to include special characters (default True)
 
         Returns:
-            password (string): The generated password based on the inputted paramaters
+            password (str): The generated password based on the inputted paramaters
     """
     lowercase_letters = string.ascii_lowercase
     uppercase_letters = string.ascii_uppercase if incl_uppercase else ""

@@ -3,7 +3,8 @@
 	--dark-blue: #13587c;
 	--dark-bg: #202124;
 	--light-blue: #01abfe;
-	--green: #0f6;
+	--light-green: #0f6;
+	--dark-green: #0b3;
 	--red: #f03;
 	--font: Inter; // setting default colours and font, allowing for them to be easily changed as they don't need to be repeated
 
@@ -174,11 +175,17 @@ body {
 	// dark mode theme
 	background-color: var(--dark-bg);
 	color: white;
+	.green {
+		color: var(--light-green);
+	}
 }
 .app.light {
 	// light mode theme
 	background-color: #fff;
 	color: var(--dark-bg);
+	.green {
+		color: var(--dark-green);
+	}
 }
 
 a {
@@ -198,10 +205,6 @@ a {
 
 .red {
 	color: var(--red);
-}
-
-.green {
-	color: var(--green);
 }
 
 h1 {
