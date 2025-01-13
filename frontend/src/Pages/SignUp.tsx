@@ -18,6 +18,7 @@ function SignUp(props: { dark: boolean }) {
 	const [emailVerification, setEmailVerification] = useState("");
 	const [password, setPassword] = useState("");
 	const [passwordVerification, setPasswordVerification] = useState("");
+	const [error, setError] = useState("");
 
 	const signUp = () => {
 		// PLACEHOLDER UNTIL FUNCTION IS COMPLETED
@@ -32,7 +33,19 @@ function SignUp(props: { dark: boolean }) {
 			}
 		})
 			.then((r) => r.json())
-			.then(console.log);
+			.then((r) => {
+				switch (r.error) {
+					case "EMAIL_IN_USE":
+						setError("The email entered is already in use!");
+						break;
+					case undefined:
+						setError("");
+						break;
+					default:
+						setError("Internal Server Error");
+						break;
+				}
+			});
 		console.log("Submitted Information: ");
 		console.log("Email Address:", email);
 		console.log("Password:", password);
@@ -169,6 +182,7 @@ function SignUp(props: { dark: boolean }) {
 					)
 				}
 			</form>
+			{error ? <span className="red">{error}</span> : ""}
 			<button
 				onClick={signUp}
 				disabled={

@@ -15,7 +15,13 @@ from util.generate_password import (
     LengthTooLowError,
     LengthTooHighError,
 )
-from util.password_hashing import generate_hash, verify_password
+from db.user import (
+    User,
+    create_user,
+    EmailNotValidError,
+    PasswordNotStrongEnoughError,
+    EmailAlreadyExistsError,
+)
 
 # gets default values from the password generator function
 default_length, default_uppercase, default_numbers, default_specialchars = (
@@ -100,8 +106,11 @@ def generate_password():
 
 @app.post("/api/sign-up")
 def sign_up():
+    # get the post request data
     data = json.loads(request.data)
+    # make sure that both the email and password are in the request field
     if not ("email" in data.keys() and "password" in data.keys()):
+        # return an error if not
         return jsonify(
             {
                 "error": "MISSING_DATA",
@@ -110,28 +119,38 @@ def sign_up():
         )
     email = data["email"]
     password = data["password"]
+    # check that the email is valid and the password is secure enough and give an error if not
     if not re.match(emailRegex, email):
         return jsonify({"error": "INVALID_EMAIL", "text": "Email entered is invalid"})
     if not re.match(passwordRegex, password):
         return jsonify(
             {"error": "INVALID_PASSWORD", "text": "Password is not secure enough"}
         )
-    # INCLUDE CODE HERE WHEN DATABASE IS IMPLEMENTED:
-    # if EMAIL IS ALREADY IN USE:
-    #   return jsonify(
-    #       {"error": "EMAIL_IN_USE", "text": "Email is already in use"}
-    #   )
-
-    # Database is not yet implemented so this is acting as a placeholder until then
-    hashed_password, salt = generate_hash(password)
-    data = {
-        "email": email,
-        "password": password,
-        "hashed_password": hashed_password,
-        "salt": salt,
-    }
-    print(data)
-    return jsonify(data)
+    try:
+        # create a user with the details inputted
+        user: User = create_user(email, password)
+    except EmailAlreadyExistsError:
+        # if the email is already in use, give an error
+        return jsonify({"error": "EMAIL_IN_USE", "text": "Email is already in use"})
+    except EmailNotValidError:
+        # if the email is invalid, give an error
+        return jsonify({"error": "INVALID_EMAIL", "text": "Email entered is invalid"})
+    except PasswordNotStrongEnoughError:
+        # if the password isn't strong enough give an error
+        return jsonify(
+            {"error": "INVALID_PASSWORD", "text": "Password is not secure enough"}
+        )
+    # return the data given by the create_user function
+    return jsonify(
+        {
+            "user_id": user.user_id,
+            "email": user.email,
+            "password_hash": user.password_hash,
+            "salt": user.salt,
+            "totp_enabled": user.totp_enabled,
+            "totp_secret": user.totp_secret,
+        }
+    )
 
 
 # only run if the file is being called directly
