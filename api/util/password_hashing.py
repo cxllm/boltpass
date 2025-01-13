@@ -6,7 +6,7 @@ def generate_hash(password: str) -> tuple[str, str]:
     """
     Generates a password hash and salt to securely store the master password in the database
 
-        Paramaters:
+        Parameters:
             password (str): The password to be hashed
 
         Returns:

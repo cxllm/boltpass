@@ -21,7 +21,7 @@ def password_generator(
     """
     Generates a random secure password
 
-        Paramaters:
+        Parameters:
             length (int): The length of the generated password (default 20)
             incl_uppercase (bool): Whether or not to include uppercase characters (default True)
             incl_numbers (bool): Whether or not to include numbers (default True)
