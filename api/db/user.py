@@ -2,7 +2,10 @@ import os
 import sys
 import uuid
 import re
-from util.password_hashing import generate_hash, verify_password
+
+path = os.path.dirname(os.path.realpath(__file__ + "/.."))
+sys.path.insert(1, path)
+from util.password_hashing import verify_password, generate_hash
 
 path = os.path.dirname(os.path.realpath(__file__))
 sys.path.insert(1, path)
@@ -30,6 +33,11 @@ class EmailNotValidError(Exception):
     pass
 
 
+# Error for when the email is not registered
+class EmailNotRegisteredError(Exception):
+    pass
+
+
 class User:
     def __init__(self, email_address="", user_id=""):
         # if neither email_address and user_id both have no value then throw an error
@@ -46,6 +54,8 @@ class User:
                 "SELECT * FROM users WHERE email_address = %s", (email_address,)
             )
         data = cursor.fetchone()
+        if data is None:
+            raise EmailNotRegisteredError()
         # put the data that is fetched from the database into the instance of the class
         self.user_id = data[0]
         self.email = data[1]

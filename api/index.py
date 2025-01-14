@@ -21,6 +21,7 @@ from db.user import (
     EmailNotValidError,
     PasswordNotStrongEnoughError,
     EmailAlreadyExistsError,
+    EmailNotRegisteredError,
 )
 
 # gets default values from the password generator function
@@ -151,6 +152,51 @@ def sign_up():
             "totp_secret": user.totp_secret,
         }
     )
+
+
+@app.post("/api/login")
+def login():
+    # get the post request data
+    data = json.loads(request.data)
+    # make sure that both the email and password are in the request field
+    if not ("email" in data.keys() and "password" in data.keys()):
+        # return an error if not
+        return jsonify(
+            {
+                "error": "MISSING_DATA",
+                "text": "Both username and password need to be included in the post request",
+            }
+        )
+    email = data["email"]
+    password = data["password"]
+    # check that the email is valid and give an error if not
+    if not re.match(emailRegex, email):
+        return jsonify({"error": "INVALID_EMAIL", "text": "Email entered is invalid"})
+
+    try:
+        user = User(email_address=email)
+        if not user.verify_password(password):
+            return jsonify(
+                {
+                    "error": "PASSWORD_NOT_CORRECT",
+                    "text": "The password entered is invalid",
+                }
+            )
+        else:
+            return jsonify(
+                {
+                    "user_id": user.user_id,
+                    "email": user.email,
+                    "password_hash": user.password_hash,
+                    "salt": user.salt,
+                    "totp_enabled": user.totp_enabled,
+                    "totp_secret": user.totp_secret,
+                }
+            )
+    except EmailNotRegisteredError:
+        return jsonify(
+            {"error": "EMAIL_NOT_REGISTERED", "text": "Email entered is not registered"}
+        )
 
 
 # only run if the file is being called directly

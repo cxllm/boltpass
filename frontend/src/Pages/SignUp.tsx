@@ -45,6 +45,7 @@ function SignUp(props: { dark: boolean }) {
 						setError("Internal Server Error");
 						break;
 				}
+				console.log(r);
 			});
 		console.log("Submitted Information: ");
 		console.log("Email Address:", email);
