@@ -11,6 +11,11 @@ def connect():
 
 
 def create_tables(cursor):
+    """
+    Creates the tables in the database
+    Parameters:
+        cursor: The psycopg2 cursor
+    """
     tables = (
         """
     CREATE TABLE IF NOT EXISTS users (
@@ -44,6 +49,8 @@ def create_tables(cursor):
         user_id TEXT NOT NULL,
         password_id TEXT NOT NULL,
         encrypted_password TEXT NOT NULL,
+        salt TEXT NOT NULL,
+        iv TEXT NOT NULL,
         folder_name TEXT,
         TOTP_secret TEXT,
         website TEXT,
@@ -57,6 +64,8 @@ def create_tables(cursor):
         user_id TEXT NOT NULL,
         note_id TEXT NOT NULL,
         encrypted_data TEXT NOT NULL,
+        salt TEXT NOT NULL,
+        iv TEXT NOT NULL,
         folder_name TEXT,
         name TEXT NOT NULL,
         FOREIGN KEY(user_id, folder_name) REFERENCES folders(user_id, folder_name),

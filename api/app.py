@@ -3,13 +3,14 @@ import os
 import json
 import re
 
-# to ensure that the vercel deployment works
+from flask import Flask, request, jsonify, render_template
+from flask_cors import CORS
+
+# Fixes issues with the hosting platform
+# This code will be present in many files to combat these issues
 path = os.path.dirname(os.path.realpath(__file__))
 sys.path.insert(1, path)
 
-
-from flask import Flask, request, jsonify, render_template
-from flask_cors import CORS
 from util.generate_password import (
     password_generator,
     LengthTooLowError,
@@ -150,6 +151,7 @@ def sign_up():
             "salt": user.salt,
             "totp_enabled": user.totp_enabled,
             "totp_secret": user.totp_secret,
+            "key": user.derive_key(password),
         }
     )
 
@@ -191,6 +193,7 @@ def login():
                     "salt": user.salt,
                     "totp_enabled": user.totp_enabled,
                     "totp_secret": user.totp_secret,
+                    "key": user.derive_key(password),
                 }
             )
     except EmailNotRegisteredError:

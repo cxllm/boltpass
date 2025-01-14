@@ -22,6 +22,24 @@ function App() {
 		setDark(enabled); // update it in react state
 		window.localStorage.setItem("dark", enabled.toString()); // update it in local storage
 	};
+
+	//@ts-expect-error This function is necessary but has not been implemented yet elsewhere
+	const getItemFromLocalStorage = (name: string) => {
+		const value = window.localStorage.getItem(name);
+		try {
+			if (value) {
+				const data = JSON.parse(value);
+				if (data.expiry > Date.now()) {
+					window.localStorage.removeItem(name);
+					return null;
+				} else {
+					return data.value;
+				}
+			}
+		} catch {
+			return value;
+		}
+	};
 	return (
 		<>
 			<BrowserRouter>

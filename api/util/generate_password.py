@@ -28,7 +28,7 @@ def password_generator(
             incl_special_chars (bool): Whether or not to include special characters (default True)
 
         Returns:
-            password (str): The generated password based on the inputted paramaters
+            password (str): The generated password based on the inputted parameters
     """
     lowercase_letters = string.ascii_lowercase
     uppercase_letters = string.ascii_uppercase if incl_uppercase else ""

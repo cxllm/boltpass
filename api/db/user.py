@@ -6,10 +6,10 @@ import re
 path = os.path.dirname(os.path.realpath(__file__ + "/.."))
 sys.path.insert(1, path)
 from util.password_hashing import verify_password, generate_hash
+from util.encryption import derive_key
 
 path = os.path.dirname(os.path.realpath(__file__))
 sys.path.insert(1, path)
-
 from main import connect
 
 # Regex to verify if the email is valid
@@ -40,6 +40,13 @@ class EmailNotRegisteredError(Exception):
 
 class User:
     def __init__(self, email_address="", user_id=""):
+        """
+        Constructor for the User class
+            Parameters:
+                self: Refers to the specific instance of the class
+                email_address (str): The user's email address
+                user_id (str): The user's unique ID
+        """
         # if neither email_address and user_id both have no value then throw an error
         if [email_address, user_id] in ["", ""]:
             raise ValueError("Either email_address or user_id needs to be provided!")
@@ -68,10 +75,37 @@ class User:
 
     # method to check if the password is correct
     def verify_password(self, password):
+        """
+        Checks if the users password is correct
+            Parameters:
+                self: Refers to the specific instance of the class
+                password (str): Password to verify
+            Returns
+                verified (bool): Whether or not the password is correct
+        """
         return verify_password(password, self.salt, self.password_hash)
+
+    def derive_key(self, password):
+        """
+        Derives the user's encryption key
+            Parameters:
+                self: Refers to the specific instance of the class
+                password (str): Password to derive from
+            Returns
+                key (str): The derived key in hex form
+        """
+        return derive_key(password, self.salt)[1]
 
 
 def create_user(email, password):
+    """
+    Adds a user to a database if they don't already exist
+        Parameters:
+            email (str): The user's email
+            password (str): The user's password
+        Returns
+            user (User): An instance of the User class built for that new user.
+    """
     # Check if email is valid and password is secure enough
     if not re.match(emailRegex, email):
         raise EmailNotValidError("Email is invalid")

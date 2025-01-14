@@ -22,7 +22,7 @@ def verify_password(password: str, salt: str, hashed: str) -> bool:
     """
     Verifies if the password and the salt entered match the previously stored value
 
-        Paramaters:
+        Parameters:
             password (str): The password to be verified
             salt (str): The salt that the password is to be added with
             hashed (str): The hash string that is already stored in the database to compare against

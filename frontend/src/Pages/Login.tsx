@@ -36,6 +36,17 @@ function Login(props: { dark: boolean }) {
 						break;
 				}
 				console.log(r);
+				if (r.key && r.user_id) {
+					const expiry = Date.now() + 24 * 60 * 60 * 1000;
+					window.localStorage.setItem(
+						"userID",
+						JSON.stringify({ value: r.user_id, expiry })
+					);
+					window.localStorage.setItem(
+						"key",
+						JSON.stringify({ value: r.key, expiry })
+					);
+				}
 			});
 	};
 	return (
