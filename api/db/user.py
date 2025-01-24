@@ -6,11 +6,12 @@ import re
 path = os.path.dirname(os.path.realpath(__file__ + "/.."))
 sys.path.insert(1, path)
 from util.password_hashing import verify_password, generate_hash
-from util.encryption import derive_key
+from util.encryption import derive_key, encrypt
 
 path = os.path.dirname(os.path.realpath(__file__))
 sys.path.insert(1, path)
-from main import connect
+from database import connect
+from password import Password
 
 # Regex to verify if the email is valid
 emailRegex = r"^[a-zA-Z0-9.!#$%&’*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$"
@@ -38,6 +39,11 @@ class EmailNotRegisteredError(Exception):
     pass
 
 
+# Error for when the User ID is not found
+class InvalidUserIDError(Exception):
+    pass
+
+
 class User:
     def __init__(self, email_address="", user_id=""):
         """
@@ -55,14 +61,17 @@ class User:
         # if the user id is entered then fetch the user from the database using this
         if user_id:
             cursor.execute("SELECT * FROM users WHERE user_id = %s", (user_id,))
+            data = cursor.fetchone()
+            if data is None:
+                raise InvalidUserIDError()
         # if the email is entered then fetch the user from the database using this
         elif email_address:
             cursor.execute(
                 "SELECT * FROM users WHERE email_address = %s", (email_address,)
             )
-        data = cursor.fetchone()
-        if data is None:
-            raise EmailNotRegisteredError()
+            data = cursor.fetchone()
+            if data is None:
+                raise EmailNotRegisteredError()
         # put the data that is fetched from the database into the instance of the class
         self.user_id = data[0]
         self.email = data[1]
@@ -70,6 +79,7 @@ class User:
         self.salt = data[3]
         self.totp_enabled = data[4]
         self.totp_secret = data[5]
+        self.passwords = []
         conn.commit()
         conn.close()
 
@@ -95,6 +105,55 @@ class User:
                 key (str): The derived key in hex form
         """
         return derive_key(password, self.salt)[1]
+
+    def add_password(
+        self, name, password, key, website=None, totp_secret=None, folder_name=None
+    ):
+        """
+        Add a password to the database
+            Parameters:
+                self: Refers to the specific instance of the class
+                password (str): Password to encrypt
+                key (str): Encryption key to use
+        """
+        encrypted, salt, iv = encrypt(password, key)
+        password_id = uuid.uuid4()
+        conn, cursor = connect()
+        cursor.execute(
+            """INSERT INTO password VALUES (
+                %s, %s, %s, %s, %s, %s
+            )""",
+            (
+                self.user_id,
+                password_id,
+                encrypted,
+                salt,
+                iv,
+                folder_name,
+                totp_secret,
+                website,
+                name,
+            ),
+        )
+        conn.close()
+        password = Password(user_id=self.user_id, password_id=password_id)
+        self.passwords.append(password)
+        return password
+
+    def get_passwords(self):
+        conn, cursor = connect()
+        cursor.execute(
+            "SELECT password_id FROM passwords WHERE user_id = %s",
+            (self.user_id),
+        )
+        password_ids = cursor.fetchall()
+        conn.close()
+        passwords = [
+            Password(user_id=self.user_id, password_id=password[0])
+            for password in password_ids
+        ]
+        self.passwords = passwords
+        return passwords
 
 
 def create_user(email, password):

@@ -1,5 +1,7 @@
+import { User } from "../App";
+
 // Currently a placeholder home page until I create the real one.
-function Home(props: { dark: boolean }) {
+function LoggedInHome(props: { dark: boolean; user: User }) {
 	return (
 		<>
 			<img
@@ -9,9 +11,9 @@ function Home(props: { dark: boolean }) {
 				alt="BoltPass logo"
 			/>
 			<h1>BoltPass Password Manager</h1>
-			<p>The secure solution to your online needs</p>
+			<p>You are logged in as {props.user.email}</p>
 		</>
 	);
 }
 
-export default Home;
+export default LoggedInHome;

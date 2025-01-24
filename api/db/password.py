@@ -3,7 +3,8 @@ import sys
 
 path = os.path.dirname(os.path.realpath(__file__))
 sys.path.insert(1, path)
-from main import connect
+from database import connect
+from util.encryption import decrypt
 
 
 class Password:
@@ -26,3 +27,7 @@ class Password:
             self.website,
             self.name,
         ) = cursor.fetchone()
+        conn.close()
+
+    def decrypt(self, key):
+        return decrypt(self.encrypted, self.salt, self.iv, key)

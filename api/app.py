@@ -23,6 +23,7 @@ from db.user import (
     PasswordNotStrongEnoughError,
     EmailAlreadyExistsError,
     EmailNotRegisteredError,
+    InvalidUserIDError,
 )
 
 # gets default values from the password generator function
@@ -202,6 +203,26 @@ def login():
         )
 
 
+@app.get("/api/user/<user_id>")
+def get_user_info(user_id):
+    try:
+        user = User(user_id=user_id)
+        return jsonify(
+            {
+                "user_id": user.user_id,
+                "email": user.email,
+                "password_hash": user.password_hash,
+                "salt": user.salt,
+                "totp_enabled": user.totp_enabled,
+                "totp_secret": user.totp_secret,
+            }
+        )
+    except InvalidUserIDError:
+        return jsonify(
+            {"error": "USER_ID_INVALID", "text": "This user ID was not recognised."}
+        )
+
+
 # only run if the file is being called directly
 if __name__ == "__main__":
-    app.run(port=3000)
+    app.run(port=3000, host="0.0.0.0")

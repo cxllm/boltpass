@@ -1,8 +1,11 @@
-import { Link } from "react-router";
+import { Link, useNavigate } from "react-router";
 import { useState } from "react";
 
 // Login page
-function Login(props: { dark: boolean }) {
+function Login(props: {
+	dark: boolean;
+	login: (userID: string, key: string) => void;
+}) {
 	// Regex to verify if an email is valid
 	const emailRegex =
 		/^[a-zA-Z0-9.!#$%&’*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/;
@@ -10,6 +13,7 @@ function Login(props: { dark: boolean }) {
 	const [email, setEmail] = useState("");
 	const [password, setPassword] = useState("");
 	const [error, setError] = useState("");
+	const navigate = useNavigate();
 	const login = () => {
 		fetch("/api/login", {
 			method: "POST",
@@ -35,17 +39,9 @@ function Login(props: { dark: boolean }) {
 						setError("Internal Server Error");
 						break;
 				}
-				console.log(r);
 				if (r.key && r.user_id) {
-					const expiry = Date.now() + 24 * 60 * 60 * 1000;
-					window.localStorage.setItem(
-						"userID",
-						JSON.stringify({ value: r.user_id, expiry })
-					);
-					window.localStorage.setItem(
-						"key",
-						JSON.stringify({ value: r.key, expiry })
-					);
+					props.login(r.user_id, r.key);
+					navigate("/");
 				}
 			});
 	};
@@ -62,7 +58,7 @@ function Login(props: { dark: boolean }) {
 			</h2>
 			<h1>Login</h1>
 			<p>
-				Don't have an account? <Link to="/sign-up">Create an account</Link>
+				Don't have an account? <Link to="/sign-up">Sign up</Link>
 			</p>
 			<form className="login">
 				<label htmlFor="email">Email: </label>

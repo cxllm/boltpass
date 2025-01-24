@@ -1,7 +1,11 @@
 import { useState } from "react";
 import { FaCheck, FaTimes } from "react-icons/fa";
+import { Link, useNavigate } from "react-router";
 // Sign up page
-function SignUp(props: { dark: boolean }) {
+function SignUp(props: {
+	dark: boolean;
+	login: (userID: string, key: string) => void;
+}) {
 	// Regex to verify if an email is valid
 	const emailRegex =
 		/^[a-zA-Z0-9.!#$%&’*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/;
@@ -19,6 +23,7 @@ function SignUp(props: { dark: boolean }) {
 	const [password, setPassword] = useState("");
 	const [passwordVerification, setPasswordVerification] = useState("");
 	const [error, setError] = useState("");
+	const navigate = useNavigate();
 
 	const signUp = () => {
 		// PLACEHOLDER UNTIL FUNCTION IS COMPLETED
@@ -47,20 +52,10 @@ function SignUp(props: { dark: boolean }) {
 				}
 				console.log(r);
 				if (r.key && r.user_id) {
-					const expiry = Date.now() + 24 * 60 * 60 * 1000;
-					window.localStorage.setItem(
-						"userID",
-						JSON.stringify({ value: r.user_id, expiry })
-					);
-					window.localStorage.setItem(
-						"key",
-						JSON.stringify({ value: r.key, expiry })
-					);
+					props.login(r.user_id, r.key);
+					navigate("/");
 				}
 			});
-		console.log("Submitted Information: ");
-		console.log("Email Address:", email);
-		console.log("Password:", password);
 	};
 	return (
 		<>
@@ -74,6 +69,9 @@ function SignUp(props: { dark: boolean }) {
 				THIS PAGE IS CURRENTLY UNDER CONSTRUCTION AND WILL NOT FUNCTION AS EXPECTED
 			</h2>
 			<h1>Create an account</h1>
+			<p>
+				Already have an account? <Link to="/login">Login</Link>
+			</p>
 			<form className="login">
 				<label>Email: </label>
 				<input
