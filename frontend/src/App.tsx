@@ -12,6 +12,7 @@ import NavbarLoggedIn from "./Components/Navbar-LoggedIn";
 import LoggedInHome from "./Pages/LoggedInHome";
 import Passwords from "./Pages/Passwords";
 import SecureNotes from "./Pages/SecureNotes";
+import Settings from "./Pages/Settings";
 
 export interface User {
 	user_id: string;
@@ -149,6 +150,16 @@ function App() {
 								element={
 									loggedIn && user ? (
 										<SecureNotes dark={dark} user={user} />
+									) : (
+										<Navigate to="/login" />
+									)
+								}
+							/>
+							<Route
+								path="/user/settings"
+								element={
+									loggedIn && user ? (
+										<Settings dark={dark} user={user} />
 									) : (
 										<Navigate to="/login" />
 									)

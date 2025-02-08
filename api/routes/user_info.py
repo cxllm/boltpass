@@ -1,0 +1,67 @@
+import sys
+import os
+from flask import request, jsonify, Blueprint
+
+
+# Fixes issues with the hosting platform
+# This code will be present in many files to combat these issues
+path = os.path.dirname(os.path.realpath(__file__))
+sys.path.insert(1, path)
+from db.user import (
+    User,
+    InvalidUserIDError,
+)
+
+user_info = Blueprint("user_info", __name__)
+
+
+@user_info.get("/api/user/<user_id>/passwords")
+def get_user_passwords(user_id):
+    key = request.args.get("key")
+    if not key:
+        return jsonify(
+            {"error": "NO_KEY_ENTERED", "text": "No encryption key was provided."}
+        )
+    try:
+        user = User(user_id=user_id)
+        passwords = user.get_passwords()
+        p = []
+        for password in passwords:
+            decrypted = password.decrypt(key=key)
+            p.append(
+                {
+                    "decrypted": decrypted,
+                    "name": password.name,
+                    "folder_name": password.folder_name,
+                    "website": password.website,
+                }
+            )
+        return jsonify(p)
+    except InvalidUserIDError:
+        return jsonify(
+            {"error": "USER_ID_INVALID", "text": "This user ID was not recognised."}
+        )
+    except:
+        return jsonify(
+            {"error": "INVALID_KEY_ENTERED", "text": "The key entered is incorrect"}
+        )
+
+
+@user_info.get("/api/user/<user_id>")
+def get_user_info(user_id):
+    try:
+        user = User(user_id=user_id)
+        return jsonify(
+            {
+                "user_id": user.user_id,
+                "email": user.email,
+                "password_hash": user.password_hash,
+                "salt": user.salt,
+                "totp_enabled": user.totp_enabled,
+                "totp_secret": user.totp_secret,
+            }
+        )
+    except InvalidUserIDError:
+        return jsonify(
+            {"error": "USER_ID_INVALID", "text": "This user ID was not recognised."}
+        )

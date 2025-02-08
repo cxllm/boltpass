@@ -13,18 +13,11 @@ function Login(props: {
 	const [email, setEmail] = useState("");
 	const [password, setPassword] = useState("");
 	const [error, setError] = useState("");
+	const [totp, setTotp] = useState(false);
+	const [totpCode, setTotpCode] = useState(0);
 	const navigate = useNavigate();
 	const login = () => {
-		fetch("/api/login", {
-			method: "POST",
-			body: JSON.stringify({
-				email: email,
-				password: password
-			}),
-			headers: {
-				"Content-Type": "application/json"
-			}
-		})
+		fetch(`/api/login?email=${email}&password=${password}`)
 			.then((r) => r.json())
 			.then((r) => {
 				switch (r.error) {
@@ -40,8 +33,35 @@ function Login(props: {
 						break;
 				}
 				if (r.key && r.user_id) {
-					props.login(r.user_id, r.key);
-					navigate("/");
+					if (r.totp_enabled && !totp) {
+						setTotp(true);
+					} else if (totp) {
+						if (totpCode.toString().length != 6) {
+							setError("Invalid TOTP code entered");
+						} else {
+							fetch(`/api/verify-totp?secret=${r.totp_secret}&code=${totpCode}`)
+								.then((s) => s.json())
+								.then((s) => {
+									switch (s.error) {
+										case undefined:
+											setError("");
+											break;
+										default:
+											setError("Internal Server Error");
+											break;
+									}
+									if (s == true) {
+										props.login(r.user_id, r.key);
+										navigate("/");
+									} else {
+										setError("Invalid TOTP code entered!");
+									}
+								});
+						}
+					} else {
+						props.login(r.user_id, r.key);
+						navigate("/");
+					}
 				}
 			});
 	};
@@ -83,13 +103,33 @@ function Login(props: {
 					name="password"
 					onInput={(v) => setPassword(v.currentTarget.value)}
 				/>
+				{totp ? (
+					<>
+						<label>
+							<span className="red">2FA Code Required</span>
+						</label>
+						<input
+							type="number"
+							placeholder="Enter your TOTP code"
+							maxLength={6}
+							minLength={6}
+							required
+							name="input"
+							onInput={(v) => setTotpCode(Number(v.currentTarget.value))}
+						/>
+					</>
+				) : (
+					""
+				)}
 			</form>
 			{error ? <span className="red">{error}</span> : ""}
 			<button
 				onClick={login}
 				disabled={
 					// only allow the user to login if email is valid and password exists
-					!emailRegex.test(email) || !password
+					!emailRegex.test(email) ||
+					!password ||
+					(totp && totpCode.toString().length != 6)
 				}
 			>
 				Login

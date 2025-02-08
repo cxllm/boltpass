@@ -1,7 +1,5 @@
 import sys
 import os
-import json
-import re
 
 from flask import Flask, request, jsonify, render_template
 from flask_cors import CORS
@@ -16,15 +14,10 @@ from util.generate_password import (
     LengthTooLowError,
     LengthTooHighError,
 )
-from db.user import (
-    User,
-    create_user,
-    EmailNotValidError,
-    PasswordNotStrongEnoughError,
-    EmailAlreadyExistsError,
-    EmailNotRegisteredError,
-    InvalidUserIDError,
-)
+from util.totp import verify as verify_totp, generate_totp, generate_code
+
+from routes.user_management import user_management
+from routes.user_info import user_info
 
 # gets default values from the password generator function
 default_length, default_uppercase, default_numbers, default_specialchars = (
@@ -44,6 +37,9 @@ app = Flask(
 )
 # Initliases CORS (Cross-Origin Resource Sharing) which allows the backend to be used within the frontend
 CORS(app)
+# Routes in a separate file to keep the main file uncluttered
+app.register_blueprint(user_management)
+app.register_blueprint(user_info)
 
 
 @app.get("/")
@@ -107,120 +103,45 @@ def generate_password():
         return jsonify({"error": "The length of the password was too long"})
 
 
-@app.post("/api/sign-up")
-def sign_up():
-    # get the post request data
-    data = json.loads(request.data)
-    # make sure that both the email and password are in the request field
-    if not ("email" in data.keys() and "password" in data.keys()):
-        # return an error if not
+@app.get("/api/verify-totp")
+def verify_user_totp():
+    code = request.args.get("code")
+    secret = request.args.get("secret")
+    if not code and not secret:
         return jsonify(
             {
                 "error": "MISSING_DATA",
-                "text": "Both username and password need to be included in the post request",
+                "text": "Need a code and a secret",
             }
         )
-    email = data["email"]
-    password = data["password"]
-    # check that the email is valid and the password is secure enough and give an error if not
-    if not re.match(emailRegex, email):
-        return jsonify({"error": "INVALID_EMAIL", "text": "Email entered is invalid"})
-    if not re.match(passwordRegex, password):
-        return jsonify(
-            {"error": "INVALID_PASSWORD", "text": "Password is not secure enough"}
-        )
-    try:
-        # create a user with the details inputted
-        user: User = create_user(email, password)
-    except EmailAlreadyExistsError:
-        # if the email is already in use, give an error
-        return jsonify({"error": "EMAIL_IN_USE", "text": "Email is already in use"})
-    except EmailNotValidError:
-        # if the email is invalid, give an error
-        return jsonify({"error": "INVALID_EMAIL", "text": "Email entered is invalid"})
-    except PasswordNotStrongEnoughError:
-        # if the password isn't strong enough give an error
-        return jsonify(
-            {"error": "INVALID_PASSWORD", "text": "Password is not secure enough"}
-        )
-    # return the data given by the create_user function
-    return jsonify(
-        {
-            "user_id": user.user_id,
-            "email": user.email,
-            "password_hash": user.password_hash,
-            "salt": user.salt,
-            "totp_enabled": user.totp_enabled,
-            "totp_secret": user.totp_secret,
-            "key": user.derive_key(password),
-        }
-    )
+    return jsonify(verify_totp(secret, code))
 
 
-@app.post("/api/login")
-def login():
-    # get the post request data
-    data = json.loads(request.data)
-    # make sure that both the email and password are in the request field
-    if not ("email" in data.keys() and "password" in data.keys()):
-        # return an error if not
+@app.get("/api/generate-totp-code")
+def generate_totp_code():
+    secret = request.args.get("secret")
+    if not secret:
         return jsonify(
             {
                 "error": "MISSING_DATA",
-                "text": "Both username and password need to be included in the post request",
+                "text": "Need a secret",
             }
         )
-    email = data["email"]
-    password = data["password"]
-    # check that the email is valid and give an error if not
-    if not re.match(emailRegex, email):
-        return jsonify({"error": "INVALID_EMAIL", "text": "Email entered is invalid"})
-
-    try:
-        user = User(email_address=email)
-        if not user.verify_password(password):
-            return jsonify(
-                {
-                    "error": "PASSWORD_NOT_CORRECT",
-                    "text": "The password entered is invalid",
-                }
-            )
-        else:
-            return jsonify(
-                {
-                    "user_id": user.user_id,
-                    "email": user.email,
-                    "password_hash": user.password_hash,
-                    "salt": user.salt,
-                    "totp_enabled": user.totp_enabled,
-                    "totp_secret": user.totp_secret,
-                    "key": user.derive_key(password),
-                }
-            )
-    except EmailNotRegisteredError:
-        return jsonify(
-            {"error": "EMAIL_NOT_REGISTERED", "text": "Email entered is not registered"}
-        )
+    return jsonify(generate_code(secret))
 
 
-@app.get("/api/user/<user_id>")
-def get_user_info(user_id):
-    try:
-        user = User(user_id=user_id)
+@app.get("/api/generate-totp")
+def generate_user_totp():
+    name = request.args.get("name")
+    if not name:
         return jsonify(
             {
-                "user_id": user.user_id,
-                "email": user.email,
-                "password_hash": user.password_hash,
-                "salt": user.salt,
-                "totp_enabled": user.totp_enabled,
-                "totp_secret": user.totp_secret,
+                "error": "MISSING_DATA",
+                "text": "Need a name",
             }
         )
-    except InvalidUserIDError:
-        return jsonify(
-            {"error": "USER_ID_INVALID", "text": "This user ID was not recognised."}
-        )
+    secret, image = generate_totp(name)
+    return jsonify({"secret": secret, "image": image})
 
 
 # only run if the file is being called directly
