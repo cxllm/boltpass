@@ -26,7 +26,6 @@ function SignUp(props: {
 	const navigate = useNavigate();
 
 	const signUp = () => {
-		// PLACEHOLDER UNTIL FUNCTION IS COMPLETED
 		fetch("/api/sign-up", {
 			method: "POST",
 			body: JSON.stringify({
@@ -39,6 +38,7 @@ function SignUp(props: {
 		})
 			.then((r) => r.json())
 			.then((r) => {
+				// Display relevant error message
 				switch (r.error) {
 					case "EMAIL_IN_USE":
 						setError("The email entered is already in use!");
@@ -50,7 +50,7 @@ function SignUp(props: {
 						setError("Internal Server Error");
 						break;
 				}
-				console.log(r);
+				// log the user in if it is a valid combination
 				if (r.key && r.user_id) {
 					props.login(r.user_id, r.key);
 					navigate("/");
@@ -65,9 +65,6 @@ function SignUp(props: {
 				className="logo"
 				alt="BoltPass logo"
 			/>
-			<h2>
-				THIS PAGE IS CURRENTLY UNDER CONSTRUCTION AND WILL NOT FUNCTION AS EXPECTED
-			</h2>
 			<h1>Create an account</h1>
 			<p>
 				Already have an account? <Link to="/login">Login</Link>

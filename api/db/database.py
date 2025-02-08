@@ -4,6 +4,12 @@ from dotenv import load_dotenv
 
 
 def connect():
+    """
+    Connect to the database
+        Returns
+            conn: The connection to the database
+            cursor: The cursor for the database
+    """
     load_dotenv()
     connection_string = os.getenv("CONNECTION_STRING")
     with psycopg2.connect(connection_string) as conn:

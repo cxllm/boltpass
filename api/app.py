@@ -56,6 +56,7 @@ def not_found(_=None):
 
 @app.get("/api/generate-password")
 def generate_password():
+    # password generator api route
     try:
         # get the length and if it is invalid use the default length
         length = int(request.args.get("length", default=default_length))
@@ -103,8 +104,10 @@ def generate_password():
         return jsonify({"error": "The length of the password was too long"})
 
 
+# Verify if the code enetered matches the secret at that point in time
 @app.get("/api/verify-totp")
 def verify_user_totp():
+    # Gets code and secret from url query and ensures they have a value
     code = request.args.get("code")
     secret = request.args.get("secret")
     if not code and not secret:
@@ -117,8 +120,10 @@ def verify_user_totp():
     return jsonify(verify_totp(secret, code))
 
 
+# Gets the code at this point in time for a specific secret
 @app.get("/api/generate-totp-code")
 def generate_totp_code():
+    # Gets secret from url query and ensures it has a value
     secret = request.args.get("secret")
     if not secret:
         return jsonify(
@@ -130,8 +135,10 @@ def generate_totp_code():
     return jsonify(generate_code(secret))
 
 
+# generate TOTP config
 @app.get("/api/generate-totp")
 def generate_user_totp():
+    # Gets name from url query and ensures it has a value
     name = request.args.get("name")
     if not name:
         return jsonify(
@@ -140,8 +147,10 @@ def generate_user_totp():
                 "text": "Need a name",
             }
         )
+    # generate the secret and the QR code, and send it
     secret, image = generate_totp(name)
     return jsonify({"secret": secret, "image": image})
+    # image can be displayed using data:image/png;base64,[IMAGE DATA]
 
 
 # only run if the file is being called directly

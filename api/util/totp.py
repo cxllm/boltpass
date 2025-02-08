@@ -7,6 +7,16 @@ import qrcode
 
 
 def generate_totp(name):
+    """
+    Generates a random TOTP combination
+
+        Parameters:
+            name (str): The name to be attributed to the QR code
+
+        Returns:
+            secret_key (str): The secret for the TOTP config
+            encoded_img (str): The QR code data encoded in base 64
+    """
 
     random_bytes = os.urandom(20)  # generates a random sequences of bytes
 
@@ -32,16 +42,28 @@ def generate_totp(name):
 
     # generate the image with white background and boxes in white
     img = qr.make_image(fill="black", back_color="white")
+
+    # convert the image to bytes
     byte_arr = io.BytesIO()
     img.save(byte_arr, format="PNG")
-    img.show()
     byte_arr.seek(0)
+    # convert this to base64 and get rid of line breaks
     encoded_img = base64.encodebytes(byte_arr.getvalue()).decode("utf-8")
     encoded_img = encoded_img.replace("\n", "")
     return secret_key, encoded_img
 
 
 def verify(secret_key, code):
+    """
+    Verifies a code against a TOTP secret for right now or 30 seconds ago
+
+        Parameters:
+            secret_key (str): The secret for the TOTP config
+            code (str): The code to verify
+
+        Returns:
+            output (bool): Whether the key is valid or not
+    """
     # create an instance of pyotp
     totp = pyotp.TOTP(secret_key)
     # Checks if code is valid now or was valid 30 seconds ago
@@ -55,6 +77,15 @@ def verify(secret_key, code):
 
 
 def generate_code(secret_key):
+    """
+    Generates a code for a TOTP secret for right now
+
+        Parameters:
+            secret_key (str): The secret for the TOTP config
+
+        Returns:
+            code (bool): The code for right now
+    """
     # create an instance of pyotp
     totp = pyotp.TOTP(secret_key)
     # get the current code

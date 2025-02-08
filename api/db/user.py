@@ -116,8 +116,11 @@ class User:
                 password (str): Password to encrypt
                 key (str): Encryption key to use
         """
+        # encrypt the password using AES
         encrypted, salt, iv = encrypt(password, key)
+        # assign the password a random ID
         password_id = uuid.uuid4()
+        # add to the database
         conn, cursor = connect()
         cursor.execute(
             """INSERT INTO password VALUES (
@@ -141,6 +144,15 @@ class User:
         return password
 
     def get_passwords(self):
+        """
+        Gets all passwords from the database
+            Parameters:
+                self: Refers to the specific instance of the class
+
+            Returns:
+                passwords (Password[]): A list of the user's passwords, as instances of the Password class
+
+        """
         conn, cursor = connect()
         cursor.execute(
             "SELECT password_id FROM passwords WHERE user_id = %s",

@@ -41,8 +41,10 @@ function App() {
 	};
 
 	const getItemFromLocalStorage = (name: string) => {
+		// function to get item from local storage
 		const value = window.localStorage.getItem(name);
 		try {
+			// if the value has expired then get rid of it
 			if (value) {
 				const data = JSON.parse(value);
 				if (data.expiry < Date.now()) {
@@ -58,16 +60,21 @@ function App() {
 	};
 
 	const logOut = () => {
+		// Get rid of user id and key values when user logs out
 		window.localStorage.removeItem("userID");
 		window.localStorage.removeItem("key");
 		setLoggedIn(false);
+		// redirect to home page
 		return <Navigate to="/" />;
 	};
 	const getUserInfo = async () => {
+		// function to get user info
+		// gets user id from local storage
 		const userID = getItemFromLocalStorage("userID");
 		if (userID == null) {
 			return undefined;
 		}
+		// fetchs user info from database
 		return fetch("/api/user/" + userID)
 			.then((r) => r.json())
 			.then((r: User) => {
@@ -81,9 +88,11 @@ function App() {
 			});
 	};
 	const [user, setUser] = useState<User>();
-	console.log(loggedIn, user, loggedIn && !user);
 	if (loggedIn && !user) getUserInfo().then((r) => setUser(r));
 	const login = (userID: string, key: string) => {
+		// function to login user
+		// local storage does not have a built in expiry functionality, so expiry has to be done automatically
+		// this means the maximum period of time a user can be logged in for is 1 day
 		const expiry = Date.now() + 24 * 60 * 60 * 1000;
 		window.localStorage.setItem(
 			"userID",

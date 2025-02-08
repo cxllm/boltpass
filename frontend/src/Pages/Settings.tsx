@@ -1,6 +1,6 @@
 import { User } from "../App";
 
-// Currently a placeholder home page until I create the real one.
+// Currently a placeholder settings page until I create the real one.
 function Settings(props: { dark: boolean; user: User }) {
 	return (
 		<>

@@ -27,7 +27,7 @@ emailRegex = r"^[a-zA-Z0-9.!#$%&’*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-
 passwordRegex = "^(?=.*[0-9])(?=.*[A-Z])(?=.*[a-z])(?=.*[^0-9A-Za-z]).{8,}$"
 
 
-# Using POST to correspond to a CREATE command
+# Using POST to correspond to a CREATE command in SQL
 @user_management.post("/api/sign-up")
 def sign_up():
     # get the post request data
@@ -78,10 +78,13 @@ def sign_up():
     )
 
 
+# Using GET to correspond to a SELECT command in SQL
 @user_management.get("/api/login")
 def login():
+    # logs the user in
     referrer = request.referrer
     print(referrer)
+    # get email and password from url query, and verifies if they have values
     email = request.args.get("email")
     password = request.args.get("password")
     if not email or not password:
@@ -97,7 +100,9 @@ def login():
         return jsonify({"error": "INVALID_EMAIL", "text": "Email entered is invalid"})
 
     try:
+        # Initialise the user class with the email
         user = User(email_address=email)
+        # Make sure password is correct
         if not user.verify_password(password):
             return jsonify(
                 {
@@ -106,6 +111,7 @@ def login():
                 }
             )
         else:
+            # If password is correct, return their info with encryption key
             return jsonify(
                 {
                     "user_id": user.user_id,
@@ -118,6 +124,7 @@ def login():
                 }
             )
     except EmailNotRegisteredError:
+        # If the user doesn't exist
         return jsonify(
             {"error": "EMAIL_NOT_REGISTERED", "text": "Email entered is not registered"}
         )
