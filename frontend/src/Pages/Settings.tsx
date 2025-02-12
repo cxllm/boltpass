@@ -10,9 +10,12 @@ function Settings(props: { dark: boolean; user: User }) {
 				className="logo"
 				alt="BoltPass logo"
 			/>
-			<h1>BoltPass Password Manager</h1>
-			<p>You are logged in as {props.user.email}</p>
-			<h2>Enable 2FA</h2>
+			<h1>BoltPass Password Manager - Account Settings</h1>
+			<h2>User Details</h2>
+			<p>Email: {props.user.email}</p>
+			<p>User ID: {props.user.user_id}</p>
+			<h2>Two-Factor Authentication</h2>
+			<p>Active: {props.user.totp_enabled ? "Yes" : "No"}</p>
 		</>
 	);
 }

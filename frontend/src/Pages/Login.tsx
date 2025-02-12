@@ -111,15 +111,15 @@ function Login(props: {
 					onInput={(v) => setPassword(v.currentTarget.value)}
 				/>
 				{
-					//only show if TOTP is enabled
+					//only show if 2FA is enabled
 					totp ? (
 						<>
 							<label>
-								<span className="red">2FA Code Required</span>
+								<span className="red">Two-Factor Authentication Code Required</span>
 							</label>
 							<input
 								type="number"
-								placeholder="Enter your TOTP code"
+								placeholder="Enter your 2FA code"
 								maxLength={6}
 								minLength={6}
 								required

@@ -95,8 +95,11 @@ export default class NavigationLoggedIn extends Component<
 								this.setState({ pathname: selectedKey || "/" });
 							}}
 						>
+							<Nav.Link eventKey="/user/settings" as={Link} to="/user/settings">
+								Account Settings
+							</Nav.Link>
 							<Nav.Link
-								eventKey="/login"
+								eventKey="/"
 								onClick={() => this.props.logout()}
 								as={Link}
 								to="/"
