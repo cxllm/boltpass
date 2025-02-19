@@ -16,7 +16,7 @@ user_info = Blueprint("user_info", __name__)
 
 
 @user_info.get("/api/user/<user_id>/passwords")
-def get_user_passwords(user_id):
+def user_passwords_route(user_id):
     key = request.args.get("key")
     if not key:
         return jsonify(
@@ -48,7 +48,7 @@ def get_user_passwords(user_id):
 
 
 @user_info.get("/api/user/<user_id>")
-def get_user_info(user_id):
+def user_info_route(user_id):
     try:
         user = User(user_id=user_id)
         return jsonify(

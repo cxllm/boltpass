@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { FaCheck, FaTimes } from "react-icons/fa";
 import { Link, useNavigate } from "react-router";
+import Logo from "../Components/Logo";
 // Sign up page
 function SignUp(props: {
 	dark: boolean;
@@ -59,12 +60,7 @@ function SignUp(props: {
 	};
 	return (
 		<>
-			<img
-				// pick which logo to use based on the theme chosen
-				src={`/bolt-pass-${props.dark ? "light" : "dark"}.png`}
-				className="logo"
-				alt="BoltPass logo"
-			/>
+			<Logo dark={props.dark} />
 			<h1>Create an account</h1>
 			<p>
 				Already have an account? <Link to="/login">Login</Link>

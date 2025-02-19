@@ -1,5 +1,6 @@
 import { Link, useNavigate } from "react-router";
 import { useState } from "react";
+import Logo from "../Components/Logo";
 
 // Login page
 function Login(props: {
@@ -14,7 +15,8 @@ function Login(props: {
 	const [password, setPassword] = useState("");
 	const [error, setError] = useState("");
 	const [totp, setTotp] = useState(false);
-	const [totpCode, setTotpCode] = useState(0);
+	const [totpCode, setTotpCode] = useState("");
+	const [recoveryCode, setRecoveryCode] = useState("");
 	const navigate = useNavigate();
 	const login = () => {
 		fetch(`/api/login?email=${email}&password=${password}`)
@@ -36,7 +38,7 @@ function Login(props: {
 				// Check if it is a valid combination
 				if (r.key && r.user_id) {
 					// Check if the user has 2FA enabled, and if they do, require it to be completed
-					if (r.totp_enabled && !totp) {
+					if (r.totp_enabled && !totp && !recoveryCode) {
 						setTotp(true);
 					}
 					// the function is called again after the user enters their totp details, so in this case, log them in if the code matches
@@ -67,6 +69,8 @@ function Login(props: {
 									}
 								});
 						}
+					} else if (recoveryCode) {
+						// do something, not decided what yet
 					} else {
 						// if no 2FA, just log the user in
 						props.login(r.user_id, r.key);
@@ -77,12 +81,7 @@ function Login(props: {
 	};
 	return (
 		<>
-			<img
-				// pick which logo to use based on the theme chosen
-				src={`/bolt-pass-${props.dark ? "light" : "dark"}.png`}
-				className="logo"
-				alt="BoltPass logo"
-			/>
+			<Logo dark={props.dark} />
 			<h1>Login</h1>
 			<p>
 				Don't have an account? <Link to="/sign-up">Sign up</Link>
@@ -93,6 +92,7 @@ function Login(props: {
 					type="text"
 					placeholder="Enter your email address"
 					required
+					readOnly={totp}
 					name="email"
 					onInput={(v) => setEmail(v.currentTarget.value)}
 				/>
@@ -108,24 +108,43 @@ function Login(props: {
 					placeholder="Enter your password"
 					required
 					name="password"
+					readOnly={totp}
 					onInput={(v) => setPassword(v.currentTarget.value)}
 				/>
 				{
 					//only show if 2FA is enabled
 					totp ? (
 						<>
-							<label>
-								<span className="red">Two-Factor Authentication Code Required</span>
-							</label>
-							<input
-								type="number"
-								placeholder="Enter your 2FA code"
-								maxLength={6}
-								minLength={6}
-								required
-								name="input"
-								onInput={(v) => setTotpCode(Number(v.currentTarget.value))}
-							/>
+							<span className="red">
+								<h3>Two-Factor Authentication</h3>
+								Only <b>ONE</b> of the below options is required
+							</span>
+							<div className="grid">
+								<div className="left">
+									<label>Enter a one-time passcode (6 numbers)</label>
+									<input
+										type="number"
+										placeholder="Enter your OTP"
+										minLength={6}
+										maxLength={6}
+										name="passcode"
+										onInput={(v) => setTotpCode(v.currentTarget.value)}
+									/>
+								</div>
+								<div className="right">
+									<label>
+										Enter one of your recovery codes (8 alphanumeric characters)
+									</label>
+									<input
+										type="text"
+										placeholder="Enter your recovery code"
+										minLength={8}
+										maxLength={8}
+										name="recovery"
+										onInput={(v) => setRecoveryCode(v.currentTarget.value)}
+									/>
+								</div>
+							</div>
 						</>
 					) : (
 						""
@@ -139,7 +158,9 @@ function Login(props: {
 					// only allow the user to login if email is valid and password exists, and if totp has been entered (where relevant)
 					!emailRegex.test(email) ||
 					!password ||
-					(totp && totpCode.toString().length != 6)
+					(totp &&
+						totpCode.toString().length != 6 &&
+						recoveryCode.toString().length != 8)
 				}
 			>
 				Login

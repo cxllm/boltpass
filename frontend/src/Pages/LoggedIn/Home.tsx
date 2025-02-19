@@ -1,15 +1,11 @@
-import { User } from "../App";
+import { User } from "../../App";
+import Logo from "../../Components/Logo";
 
 // Currently a placeholder home page until I create the real one.
 function LoggedInHome(props: { dark: boolean; user: User }) {
 	return (
 		<>
-			<img
-				// pick which logo to use based on the theme chosen
-				src={`/bolt-pass-${props.dark ? "light" : "dark"}.png`}
-				className="logo"
-				alt="BoltPass logo"
-			/>
+			<Logo dark={props.dark} />
 			<h1>BoltPass Password Manager</h1>
 			<p>You are logged in as {props.user.email}</p>
 		</>

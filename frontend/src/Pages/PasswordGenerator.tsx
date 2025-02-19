@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { FaCopy, FaKey } from "react-icons/fa6";
+import Logo from "../Components/Logo";
 
 function PasswordGenerator(props: { dark: boolean }) {
 	// creates a new item in the state for each property that can be modified in the generator password
@@ -30,12 +31,7 @@ function PasswordGenerator(props: { dark: boolean }) {
 
 	return (
 		<>
-			<img
-				// pick which logo to use based on the theme chosenW
-				src={`/bolt-pass-${props.dark ? "light" : "dark"}.png`}
-				className="logo"
-				alt="BoltPass logo"
-			/>
+			<Logo dark={props.dark} />
 			<h1>Password Generator</h1>
 			<form className="password-generator">
 				<label className="slider">

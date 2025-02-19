@@ -4,6 +4,19 @@ import base64
 import datetime
 import pyotp
 import qrcode
+import string
+import random
+
+
+def generate_recovery_codes(codes_to_generate=8, length=8):
+    alphabet = string.ascii_lowercase + string.digits
+    codes = []
+    for _ in range(codes_to_generate):
+        code = ""
+        for _ in range(length):
+            code += random.choice(alphabet)
+        codes.append(code)
+    return codes
 
 
 def generate_totp(name):
@@ -50,7 +63,7 @@ def generate_totp(name):
     # convert this to base64 and get rid of line breaks
     encoded_img = base64.encodebytes(byte_arr.getvalue()).decode("utf-8")
     encoded_img = encoded_img.replace("\n", "")
-    return secret_key, encoded_img
+    return secret_key, encoded_img, generate_recovery_codes()
 
 
 def verify(secret_key, code):

@@ -6,6 +6,7 @@
 	--light-green: #0f6;
 	--dark-green: #0b3;
 	--red: #f03;
+	--gray: #575758;
 	--font: Inter; // setting default colours and font, allowing for them to be easily changed as they don't need to be repeated
 
 	// the settings below form part of the default CSS configuration when you set up a React application as they ensure that
@@ -116,8 +117,9 @@ body {
 			color: #fff7;
 		}
 
-		input[type="text"]:focus {
-			border: 2px solid red;
+		input:read-only {
+			background-color: var(--gray);
+			border: var(--gray);
 		}
 	}
 	form.password-generator {
@@ -149,6 +151,31 @@ body {
 		margin: 0.5rem;
 	}
 
+	div.grid {
+		display: grid;
+		color: white;
+		grid-template-columns: 1fr 1fr; /* fraction*/
+		text-align: left;
+		p {
+			margin-bottom: 0.25rem;
+		}
+		div {
+			margin: 5px 5px;
+			padding: 10px 10px;
+			border-radius: 10px;
+			background-color: #2a2a2aaa;
+			input[type="text"] {
+				width: 100%;
+			}
+		}
+		div.right {
+			margin-right: 0;
+		}
+		div.left {
+			margin-left: 0;
+		}
+	}
+
 	@media screen and (max-width: 1000px) {
 		// modifies styles for mobile devices
 		.content {
@@ -169,6 +196,13 @@ body {
 
 		form.login {
 			width: 90vw;
+		}
+
+		div.grid {
+			grid-template-columns: 1fr !important;
+			div {
+				margin: 0;
+			}
 		}
 	}
 }

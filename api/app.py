@@ -43,19 +43,19 @@ app.register_blueprint(user_info)
 
 
 @app.get("/")
-def root():
+def root_route():
     # the root function sends the request to the frontend where it is handled accordingly
     return render_template("index.html")
 
 
 @app.errorhandler(404)
-def not_found(_=None):
+def not_found_route(_=None):
     # Sends all pages that aren't covered by the backend to the frontend where it is handled accordingly
     return render_template("index.html")
 
 
 @app.get("/api/generate-password")
-def generate_password():
+def generate_password_route():
     # password generator api route
     try:
         # get the length and if it is invalid use the default length
@@ -106,7 +106,7 @@ def generate_password():
 
 # Verify if the code enetered matches the secret at that point in time
 @app.get("/api/verify-totp")
-def verify_user_totp():
+def verify_totp_route():
     # Gets code and secret from url query and ensures they have a value
     code = request.args.get("code")
     secret = request.args.get("secret")
@@ -122,7 +122,7 @@ def verify_user_totp():
 
 # Gets the code at this point in time for a specific secret
 @app.get("/api/generate-totp-code")
-def generate_totp_code():
+def generate_totp_code_route():
     # Gets secret from url query and ensures it has a value
     secret = request.args.get("secret")
     if not secret:
@@ -137,7 +137,7 @@ def generate_totp_code():
 
 # generate TOTP config
 @app.get("/api/generate-totp")
-def generate_user_totp():
+def generate_totp_route():
     # Gets name from url query and ensures it has a value
     name = request.args.get("name")
     if not name:
@@ -148,11 +148,16 @@ def generate_user_totp():
             }
         )
     # generate the secret and the QR code, and send it
-    secret, image = generate_totp(name)
-    return jsonify({"secret": secret, "image": image})
-    # image can be displayed using data:image/png;base64,[IMAGE DATA]
+    secret, image, codes = generate_totp(name)
+    return jsonify(
+        {
+            "secret": secret,
+            "image": f"data:image/png;base64,{image}",
+            "recovery_codes": codes,
+        }
+    )
 
 
 # only run if the file is being called directly
 if __name__ == "__main__":
-    app.run(port=3000, host="0.0.0.0")
+    app.run(port=3000, host="0.0.0.0", debug=True)

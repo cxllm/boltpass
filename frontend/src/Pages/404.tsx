@@ -1,16 +1,13 @@
+import Logo from "../Components/Logo";
 // 404 page
 function NotFound(props: { dark: boolean }) {
 	return (
 		<>
-			<img
-				// pick which logo to use based on the theme chosen
-				src={`/bolt-pass-${props.dark ? "light" : "dark"}.png`}
-				className="logo"
-				alt="BoltPass logo"
-			/>
+			<Logo dark={props.dark} />
 			<h1>Page Not Found</h1>
 			<p className="not-found">
-				The page {window.location.pathname} was not found on the server{" "}
+				The page {window.location.pathname} was not found on the server
+				<br />
 				<a href="/">{"<<"} Go back home</a>
 			</p>
 		</>

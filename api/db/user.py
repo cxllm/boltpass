@@ -77,7 +77,7 @@ class User:
         self.email = data[1]
         self.password_hash = data[2]
         self.salt = data[3]
-        self.totp_enabled = data[4]
+        self.tfa_enabled = data[4]
         self.totp_secret = data[5]
         self.passwords = []
         conn.commit()
@@ -156,7 +156,7 @@ class User:
         conn, cursor = connect()
         cursor.execute(
             "SELECT password_id FROM passwords WHERE user_id = %s",
-            (self.user_id),
+            (self.user_id,),
         )
         password_ids = cursor.fetchall()
         conn.close()
@@ -166,6 +166,43 @@ class User:
         ]
         self.passwords = passwords
         return passwords
+
+    def disable_tfa(self):
+        self.tfa_enabled = False
+        self.totp_secret = None
+        conn, cursor = connect()
+        cursor.execute(
+            """UPDATE users
+                SET tfa_enabled = %s, totp_secret = %s
+                WHERE user_id = %s
+            """,
+            (False, None, self.user_id),
+        )
+        cursor.execute(
+            """DELETE FROM recovery_codes WHERE user_id = %s""", (self.user_id)
+        )
+        conn.commit()
+        conn.close()
+
+    def enable_tfa(self, totp_secret, recovery_codes):
+        self.tfa_enabled = True
+        self.totp_secret = totp_secret
+        conn, cursor = connect()
+        cursor.execute(
+            """UPDATE users
+                SET tfa_enabled = %s, totp_secret = %s 
+                WHERE user_id = %s""",
+            (True, totp_secret),
+        )
+        for code in recovery_codes:
+            hashed, salt = generate_hash(code)
+            code_id = uuid.uuid4()
+            cursor.execute(
+                "INSERT INTO recovery_codes VALUES (%s, %s, %s, %s)",
+                (self.user_id, code_id, hashed, salt),
+            )
+        conn.commit()
+        conn.close()
 
 
 def create_user(email, password):
@@ -205,3 +242,43 @@ def create_user(email, password):
     conn.close()
     # return the User class with the information that was just generated
     return User(email_address=email)
+
+
+def delete_user(user_id):
+    """
+    Deletes a user from the database
+        Parameters:
+            user_id (str): The user ID to delete
+    """
+    # Delete user data and all data in other tables that is associated with that user
+    conn, cursor = connect()
+    cursor.execute(
+        """DELETE FROM users 
+            WHERE user_id = %s""",
+        (user_id,),
+    )
+    cursor.execute(
+        """DELETE FROM passwords
+            WHERE user_id = %s""",
+        (user_id,),
+    )
+    cursor.execute(
+        """DELETE FROM secure_notes
+            WHERE user_id = %s""",
+        (user_id,),
+    )
+    cursor.execute(
+        """DELETE FROM folders
+            WHERE user_id = %s""",
+        (user_id,),
+    )
+    cursor.execute(
+        """DELETE FROM recovery_codes
+            WHERE user_id = %s""",
+        (user_id,),
+    )
+    cursor.execute("SELECT * FROM users WHERE user_id=%s", (user_id,))
+    out = cursor.fetchone()
+    conn.commit()
+    conn.close()
+    return out is None

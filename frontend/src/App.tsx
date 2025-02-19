@@ -9,10 +9,12 @@ import { useState } from "react";
 import Login from "./Pages/Login";
 import SignUp from "./Pages/SignUp";
 import NavbarLoggedIn from "./Components/Navbar-LoggedIn";
-import LoggedInHome from "./Pages/LoggedInHome";
-import Passwords from "./Pages/Passwords";
-import SecureNotes from "./Pages/SecureNotes";
-import Settings from "./Pages/Settings";
+import LoggedInHome from "./Pages/LoggedIn/Home";
+import Passwords from "./Pages/LoggedIn/Passwords";
+import SecureNotes from "./Pages/LoggedIn/SecureNotes";
+import Settings from "./Pages/LoggedIn/Settings/Main";
+import DeleteAccount from "./Pages/LoggedIn/Settings/DeleteAccount";
+import Update2FA from "./Pages/LoggedIn/Settings/UpdateTOTP";
 
 export interface User {
 	user_id: string;
@@ -27,9 +29,6 @@ function App() {
 	const [dark, setDark] = useState(
 		// set the "dark" state to the exisiting element in local storage or true if it doesn't exist
 		!(window.localStorage.getItem("dark") == "false")
-	);
-	const [loggedIn, setLoggedIn] = useState(
-		window.localStorage.getItem("userID") ? true : false
 	);
 	const darkMode = () => {
 		// function to update the darkMode prefernces
@@ -58,15 +57,10 @@ function App() {
 			return value;
 		}
 	};
+	const [loggedIn, setLoggedIn] = useState(
+		getItemFromLocalStorage("userID") ? true : false
+	);
 
-	const logOut = () => {
-		// Get rid of user id and key values when user logs out
-		window.localStorage.removeItem("userID");
-		window.localStorage.removeItem("key");
-		setLoggedIn(false);
-		// redirect to home page
-		return <Navigate to="/" />;
-	};
 	const getUserInfo = async () => {
 		// function to get user info
 		// gets user id from local storage
@@ -89,7 +83,7 @@ function App() {
 	};
 	const [user, setUser] = useState<User>();
 	if (loggedIn && !user) getUserInfo().then((r) => setUser(r));
-	const login = (userID: string, key: string) => {
+	const logIn = (userID: string, key: string) => {
 		// function to login user
 		// local storage does not have a built in expiry functionality, so expiry has to be done automatically
 		// this means the maximum period of time a user can be logged in for is 1 day
@@ -101,6 +95,15 @@ function App() {
 		window.localStorage.setItem("key", JSON.stringify({ value: key, expiry }));
 		setLoggedIn(true);
 		getUserInfo().then((r) => setUser(r));
+	};
+	const logOut = () => {
+		// Get rid of user id and key values when user logs out
+		window.localStorage.removeItem("userID");
+		window.localStorage.removeItem("key");
+		setLoggedIn(false);
+		setUser(undefined);
+		// redirect to home page
+		return <Navigate to="/" />;
 	};
 	return (
 		<>
@@ -135,13 +138,13 @@ function App() {
 							<Route
 								path="/login"
 								element={
-									loggedIn ? <Navigate to="/" /> : <Login dark={dark} login={login} />
+									loggedIn ? <Navigate to="/" /> : <Login dark={dark} login={logIn} />
 								}
 							/>
 							<Route
 								path="/sign-up"
 								element={
-									loggedIn ? <Navigate to="/" /> : <SignUp dark={dark} login={login} />
+									loggedIn ? <Navigate to="/" /> : <SignUp dark={dark} login={logIn} />
 								}
 							/>
 							<Route
@@ -169,6 +172,26 @@ function App() {
 								element={
 									loggedIn && user ? (
 										<Settings dark={dark} user={user} />
+									) : (
+										<Navigate to="/login" />
+									)
+								}
+							/>
+							<Route
+								path="/user/settings/delete"
+								element={
+									loggedIn && user ? (
+										<DeleteAccount dark={dark} user={user} logout={logOut} />
+									) : (
+										<Navigate to="/login" />
+									)
+								}
+							/>
+							<Route
+								path="/user/settings/2fa"
+								element={
+									loggedIn && user ? (
+										<Update2FA dark={dark} user={user} />
 									) : (
 										<Navigate to="/login" />
 									)

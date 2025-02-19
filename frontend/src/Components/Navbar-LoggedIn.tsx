@@ -98,12 +98,7 @@ export default class NavigationLoggedIn extends Component<
 							<Nav.Link eventKey="/user/settings" as={Link} to="/user/settings">
 								Account Settings
 							</Nav.Link>
-							<Nav.Link
-								eventKey="/"
-								onClick={() => this.props.logout()}
-								as={Link}
-								to="/"
-							>
+							<Nav.Link onClick={() => this.props.logout()} as={Link} to="/">
 								Log Out
 							</Nav.Link>{" "}
 						</Nav>
