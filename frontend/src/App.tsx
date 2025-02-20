@@ -15,6 +15,8 @@ import SecureNotes from "./Pages/LoggedIn/SecureNotes";
 import Settings from "./Pages/LoggedIn/Settings/Main";
 import DeleteAccount from "./Pages/LoggedIn/Settings/DeleteAccount";
 import Update2FA from "./Pages/LoggedIn/Settings/UpdateTOTP";
+import UpdateEmail from "./Pages/LoggedIn/Settings/UpdateEmail";
+import UpdatePassword from "./Pages/LoggedIn/Settings/UpdatePassword";
 
 export interface User {
 	user_id?: string;
@@ -197,7 +199,26 @@ function App() {
 									)
 								}
 							/>
-
+							<Route
+								path="/user/settings/email"
+								element={
+									loggedIn && user ? (
+										<UpdateEmail dark={dark} user={user} logout={logOut} />
+									) : (
+										<Navigate to="/login" />
+									)
+								}
+							/>
+							<Route
+								path="/user/settings/password"
+								element={
+									loggedIn && user ? (
+										<UpdatePassword dark={dark} user={user} logout={logOut} />
+									) : (
+										<Navigate to="/login" />
+									)
+								}
+							/>
 							<Route path="*" element=<NotFound dark={dark} /> />
 						</Routes>
 					</div>

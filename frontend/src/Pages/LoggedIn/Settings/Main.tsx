@@ -12,16 +12,19 @@ function Settings(props: { dark: boolean; user: User }) {
 			<div className="grid">
 				<div>
 					<h2>Change Email</h2>
+					<p>Update your account's email for logging in and contact</p>
 					<p>Current Email: {props.user.email}</p>
 					<button onClick={() => navigate("./email")}>Change Email</button>
 				</div>
 				<div>
 					<h2>Change Password</h2>
+					<p>Update your master password to access your account</p>
 					<p>This may take a few minutes.</p>
 					<button onClick={() => navigate("./password")}>Change Password</button>
 				</div>
 				<div>
 					<h2>Two-Factor Authentication</h2>
+					<p>An additional layer of security on your account</p>
 					<p>Active: {props.user.tfa_enabled ? "Yes" : "No"}</p>
 					<button onClick={() => navigate("./2fa")}>
 						{props.user.tfa_enabled ? "Disable" : "Enable"}
