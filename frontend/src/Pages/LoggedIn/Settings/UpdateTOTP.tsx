@@ -124,7 +124,7 @@ function Update2FA(props: { dark: boolean; user: User; logout: () => void }) {
 			<Logo dark={props.dark} />
 			{props.user.tfa_enabled ? (
 				<>
-					<h1>Disable 2FA</h1>
+					<h1>Disable Two Factor Authentication (2FA)</h1>
 					<p>
 						To disable 2FA please enter your password and either a one-time passcode
 						or recovery key below
@@ -183,24 +183,36 @@ function Update2FA(props: { dark: boolean; user: User; logout: () => void }) {
 				</>
 			) : (
 				<>
-					<h1>Enable 2FA</h1>
+					<h1>Enable Two Factor Authentication (2FA)</h1>
+					<p>
+						2FA provides your account with an additional layer of security by using a
+						randomly generated secret key and generating a 6-digit code based on the
+						current time. These codes refresh every 30 seconds.
+					</p>
 					{tfaConfig ? (
 						<>
-							<p>Below is the randomly generated configuration.</p>
 							<div className="grid">
 								<div className="left">
-									<p>Scan the QR code below in your authenticator app:</p>
+									<h2>Authenticators</h2>
+									<p>
+										Scan the QR code below in an authenticator app such as Google
+										Authenticator or Authy
+									</p>
 									<div className="image-center">
 										<img src={tfaConfig.image} className="qrcode" />
 									</div>
 									<p>
-										Alternatively, you can manually enter the secret below:
+										Alternatively, you can manually enter the secret key below:
 										<br />
-										Secret: <span>{tfaConfig.secret}</span>
+										Secret: <span>{tfaConfig.secret}</span>{" "}
+										<a onClick={() => navigator.clipboard.writeText(tfaConfig.secret)}>
+											Copy
+										</a>
 									</p>
 								</div>
 								<div className="right">
 									<h2>Recovery Codes</h2>
+									<h3>Please read the following carefully</h3>
 									<p>
 										If you ever lose access to your authenticator, the only way to get
 										into your account will be using one of these recovery codes.
@@ -210,8 +222,12 @@ function Update2FA(props: { dark: boolean; user: User; logout: () => void }) {
 											to recover your account if you can't use your authenticator.
 										</span>
 										<br />
-										You will not be able to enable two factor authentication unless it is
-										detected that you have downloaded these codes to your device.
+										You will have 8 recovery codes, and once you have used a code, it will
+										no longer be accepted. Ensure you re-setup 2FA before they have all
+										been used.
+										<br />
+										You cannot enable two factor authentication without downloading these
+										codes to your device.
 									</p>
 									<button onClick={downloadRecoveryCodes}>
 										Download Recovery Codes
@@ -261,7 +277,7 @@ function Update2FA(props: { dark: boolean; user: User; logout: () => void }) {
 							{message ? <span className="green">{message}</span> : ""}
 						</>
 					) : (
-						<p>Please wait, configuration is loading...</p>
+						<p>Please wait while the configuration loads...</p>
 					)}
 				</>
 			)}
