@@ -160,7 +160,7 @@ body {
 		display: grid;
 		color: white;
 		grid-template-columns: 1fr 1fr; /* fraction*/
-		text-align: left;
+		text-align: justify;
 		p {
 			margin-bottom: 0.25rem;
 		}
@@ -258,8 +258,8 @@ a,
 a:not([href]),
 a:not([class]) {
 	color: var(--light-blue) !important;
-	cursor: pointer;
-	text-decoration: none;
+	cursor: pointer !important;
+	text-decoration: none !important;
 }
 
 .logo {

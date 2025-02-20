@@ -2,6 +2,7 @@ import { useState } from "react";
 import { User } from "../../../App";
 //import { useNavigate } from "react-router";
 import Logo from "../../../Components/Logo";
+import { FaCopy } from "react-icons/fa6";
 
 function Update2FA(props: { dark: boolean; user: User; logout: () => void }) {
 	const [totpCode, setTotpCode] = useState("");
@@ -10,6 +11,7 @@ function Update2FA(props: { dark: boolean; user: User; logout: () => void }) {
 	const [error, setError] = useState("");
 	const [message, setMessage] = useState("");
 	const [downloaded, setDownloaded] = useState(false);
+	const [copied, setCopied] = useState(false);
 	const [tfaConfig, setTfaConfig] = useState<{
 		secret: string;
 		image: string;
@@ -202,11 +204,17 @@ function Update2FA(props: { dark: boolean; user: User; logout: () => void }) {
 										<img src={tfaConfig.image} className="qrcode" />
 									</div>
 									<p>
-										Alternatively, you can manually enter the secret key below:
+										Alternatively, you can manually enter the secret key:
 										<br />
-										Secret: <span>{tfaConfig.secret}</span>{" "}
-										<a onClick={() => navigator.clipboard.writeText(tfaConfig.secret)}>
-											Copy
+										Secret: <span>{tfaConfig.secret}</span>
+										<br />
+										<a
+											onClick={async () => {
+												await navigator.clipboard.writeText(tfaConfig.secret);
+												setCopied(true);
+											}}
+										>
+											<FaCopy /> {copied ? "Copied!" : "Copy"}
 										</a>
 									</p>
 								</div>
@@ -214,20 +222,19 @@ function Update2FA(props: { dark: boolean; user: User; logout: () => void }) {
 									<h2>Recovery Codes</h2>
 									<h3>Please read the following carefully</h3>
 									<p>
-										If you ever lose access to your authenticator, the only way to get
-										into your account will be using one of these recovery codes.
+										If you lose access to your authenticator, the only way to get into
+										your account is by using one of these recovery codes.
 										<br />
 										<span className="red">
-											Please store these codes in a secure location as this is the only way
-											to recover your account if you can't use your authenticator.
+											Please store these codes securely as they are the only way to recover
+											your account if you lose access to your authenticator.
 										</span>
 										<br />
-										You will have 8 recovery codes, and once you have used a code, it will
-										no longer be accepted. Ensure you re-setup 2FA before they have all
-										been used.
+										You have been assigned 8 unique recovery codes, and once you have used
+										a code, it won't be accepted again. Ensure you re-setup 2FA before
+										they have all been used so you don't lose access to your account.
 										<br />
-										You cannot enable two factor authentication without downloading these
-										codes to your device.
+										You cannot enable 2FA without downloading these codes to your device.
 									</p>
 									<button onClick={downloadRecoveryCodes}>
 										Download Recovery Codes
