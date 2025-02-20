@@ -12,6 +12,7 @@ path = os.path.dirname(os.path.realpath(__file__))
 sys.path.insert(1, path)
 from database import connect
 from password import Password
+from recovery_codes import RecoveryCode
 
 # Regex to verify if the email is valid
 emailRegex = r"^[a-zA-Z0-9.!#$%&’*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$"
@@ -72,6 +73,7 @@ class User:
             data = cursor.fetchone()
             if data is None:
                 raise EmailNotRegisteredError()
+        conn.close()
         # put the data that is fetched from the database into the instance of the class
         self.user_id = data[0]
         self.email = data[1]
@@ -80,8 +82,9 @@ class User:
         self.tfa_enabled = data[4]
         self.totp_secret = data[5]
         self.passwords = []
-        conn.commit()
-        conn.close()
+        self.recovery_codes = []
+        self.get_passwords()
+        self.get_recovery_codes()
 
     # method to check if the password is correct
     def verify_password(self, password):
@@ -167,9 +170,24 @@ class User:
         self.passwords = passwords
         return passwords
 
+    def get_recovery_codes(self):
+        conn, cursor = connect()
+        cursor.execute(
+            "SELECT code_id FROM recovery_codes WHERE user_id = %s",
+            (self.user_id,),
+        )
+        code_ids = cursor.fetchall()
+        conn.close()
+        codes = [
+            RecoveryCode(user_id=self.user_id, code_id=code[0]) for code in code_ids
+        ]
+        self.recovery_codes = codes
+        return codes
+
     def disable_tfa(self):
         self.tfa_enabled = False
         self.totp_secret = None
+        self.recovery_codes = []
         conn, cursor = connect()
         cursor.execute(
             """UPDATE users
@@ -179,7 +197,7 @@ class User:
             (False, None, self.user_id),
         )
         cursor.execute(
-            """DELETE FROM recovery_codes WHERE user_id = %s""", (self.user_id)
+            """DELETE FROM recovery_codes WHERE user_id = %s""", (self.user_id,)
         )
         conn.commit()
         conn.close()
@@ -192,17 +210,31 @@ class User:
             """UPDATE users
                 SET tfa_enabled = %s, totp_secret = %s 
                 WHERE user_id = %s""",
-            (True, totp_secret),
+            (True, totp_secret, self.user_id),
         )
+        code_ids = []
         for code in recovery_codes:
             hashed, salt = generate_hash(code)
-            code_id = uuid.uuid4()
+            code_id = str(uuid.uuid4())
+            code_ids.append(code_id)
             cursor.execute(
                 "INSERT INTO recovery_codes VALUES (%s, %s, %s, %s)",
                 (self.user_id, code_id, hashed, salt),
             )
         conn.commit()
         conn.close()
+        self.recovery_codes = [
+            RecoveryCode(self.user_id, code_id) for code_id in code_ids
+        ]
+
+    def check_recovery_code(self, to_verify):
+        valid = False
+        for code in self.recovery_codes:
+            check = code.verify(to_verify)
+            if check:
+                valid = True
+                break
+        return valid
 
 
 def create_user(email, password):
@@ -253,7 +285,12 @@ def delete_user(user_id):
     # Delete user data and all data in other tables that is associated with that user
     conn, cursor = connect()
     cursor.execute(
-        """DELETE FROM users 
+        """DELETE FROM recovery_codes
+            WHERE user_id = %s""",
+        (user_id,),
+    )
+    cursor.execute(
+        """DELETE FROM folders
             WHERE user_id = %s""",
         (user_id,),
     )
@@ -268,15 +305,11 @@ def delete_user(user_id):
         (user_id,),
     )
     cursor.execute(
-        """DELETE FROM folders
+        """DELETE FROM users 
             WHERE user_id = %s""",
         (user_id,),
     )
-    cursor.execute(
-        """DELETE FROM recovery_codes
-            WHERE user_id = %s""",
-        (user_id,),
-    )
+
     cursor.execute("SELECT * FROM users WHERE user_id=%s", (user_id,))
     out = cursor.fetchone()
     conn.commit()

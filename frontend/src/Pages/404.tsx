@@ -1,3 +1,4 @@
+import { Link } from "react-router";
 import Logo from "../Components/Logo";
 // 404 page
 function NotFound(props: { dark: boolean }) {
@@ -8,7 +9,7 @@ function NotFound(props: { dark: boolean }) {
 			<p className="not-found">
 				The page {window.location.pathname} was not found on the server
 				<br />
-				<a href="/">{"<<"} Go back home</a>
+				<Link to="/">{"<<"} Go back home</Link>
 			</p>
 		</>
 	);

@@ -17,12 +17,12 @@ import DeleteAccount from "./Pages/LoggedIn/Settings/DeleteAccount";
 import Update2FA from "./Pages/LoggedIn/Settings/UpdateTOTP";
 
 export interface User {
-	user_id: string;
-	email: string;
-	password_hash: string;
-	salt: string;
-	totp_enabled: boolean;
-	totp_secret: string;
+	user_id?: string;
+	email?: string;
+	password_hash?: string;
+	salt?: string;
+	tfa_enabled?: boolean;
+	totp_secret?: string;
 	error?: string;
 }
 function App() {
@@ -66,7 +66,7 @@ function App() {
 		// gets user id from local storage
 		const userID = getItemFromLocalStorage("userID");
 		if (userID == null) {
-			return undefined;
+			return {};
 		}
 		// fetchs user info from database
 		return fetch("/api/user/" + userID)
@@ -74,15 +74,14 @@ function App() {
 			.then((r: User) => {
 				if (r.error) {
 					logOut();
-					return undefined;
+					return {};
 				} else {
-					console.log(r);
 					return r;
 				}
 			});
 	};
-	const [user, setUser] = useState<User>();
-	if (loggedIn && !user) getUserInfo().then((r) => setUser(r));
+	const [user, setUser] = useState<User>({});
+	if (loggedIn && !user.user_id) getUserInfo().then((r) => setUser(r));
 	const logIn = (userID: string, key: string) => {
 		// function to login user
 		// local storage does not have a built in expiry functionality, so expiry has to be done automatically
@@ -95,13 +94,14 @@ function App() {
 		window.localStorage.setItem("key", JSON.stringify({ value: key, expiry }));
 		setLoggedIn(true);
 		getUserInfo().then((r) => setUser(r));
+		return <Navigate to="/" />;
 	};
 	const logOut = () => {
 		// Get rid of user id and key values when user logs out
 		window.localStorage.removeItem("userID");
 		window.localStorage.removeItem("key");
 		setLoggedIn(false);
-		setUser(undefined);
+		setUser({});
 		// redirect to home page
 		return <Navigate to="/" />;
 	};
@@ -191,7 +191,7 @@ function App() {
 								path="/user/settings/2fa"
 								element={
 									loggedIn && user ? (
-										<Update2FA dark={dark} user={user} />
+										<Update2FA dark={dark} user={user} logout={logOut} />
 									) : (
 										<Navigate to="/login" />
 									)

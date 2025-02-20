@@ -1,4 +1,4 @@
-import { Link, useNavigate } from "react-router";
+import { Link } from "react-router";
 import { useState } from "react";
 import Logo from "../Components/Logo";
 
@@ -17,64 +17,76 @@ function Login(props: {
 	const [totp, setTotp] = useState(false);
 	const [totpCode, setTotpCode] = useState("");
 	const [recoveryCode, setRecoveryCode] = useState("");
-	const navigate = useNavigate();
 	const login = () => {
+		setError("Please wait...");
 		fetch(`/api/login?email=${email}&password=${password}`)
 			.then((r) => r.json())
 			.then((r) => {
-				// Display relevant error message
-				switch (r.error) {
-					case "EMAIL_NOT_REGISTERED":
-					case "PASSWORD_NOT_CORRECT":
-						setError("The email and password combination is incorrect!");
-						break;
-					case undefined:
-						setError("");
-						break;
-					default:
-						setError("Internal Server Error");
-						break;
+				if (r.error) {
+					// Display relevant error message
+					switch (r.error) {
+						case "EMAIL_NOT_REGISTERED":
+						case "PASSWORD_NOT_CORRECT":
+							setError("The email and password combination is incorrect!");
+							break;
+						default:
+							setError("Internal Server Error");
+							break;
+					}
 				}
 				// Check if it is a valid combination
-				if (r.key && r.user_id) {
+				else if (r.key && r.user_id) {
+					setError("");
 					// Check if the user has 2FA enabled, and if they do, require it to be completed
-					if (r.totp_enabled && !totp && !recoveryCode) {
+					if (r.tfa_enabled && !totp && !recoveryCode) {
 						setTotp(true);
 					}
 					// the function is called again after the user enters their totp details, so in this case, log them in if the code matches
-					else if (totp) {
+					else if (totp && totpCode) {
 						// display the relevant error message
-						if (totpCode.toString().length != 6) {
+						if (totpCode.length != 6) {
 							setError("Invalid TOTP code entered");
 						} else {
 							fetch(`/api/verify-totp?secret=${r.totp_secret}&code=${totpCode}`)
 								.then((s) => s.json())
 								.then((s) => {
-									switch (s.error) {
-										// display the relevant error message
-										case undefined:
-											setError("");
-											break;
-										default:
-											setError("Internal Server Error");
-											break;
-									}
+									if (s.error) {
+										setError("Internal Server Error");
+									} else setError("");
 									// if the code is valid, log the user in
 									if (s == true) {
 										props.login(r.user_id, r.key);
-										navigate("/");
 									} else {
 										// if the code is invalid, show an error
 										setError("Invalid TOTP code entered!");
 									}
 								});
 						}
-					} else if (recoveryCode) {
-						// do something, not decided what yet
+					} else if (totp && recoveryCode) {
+						fetch(
+							`/api/user/${r.user_id}/verify-recovery-code?password=${password}&recovery_code=${recoveryCode}`
+						)
+							.then((r) => r.json())
+							.then((s) => {
+								if (s.error) {
+									switch (s.error) {
+										case "PASSWORD_NOT_CORRECT":
+											setError("Incorrect password entered!");
+											break;
+										default:
+											setError("Internal Server Error");
+									}
+								} else setError("");
+
+								if (s == true) {
+									props.login(r.user_id, r.key);
+								} else {
+									setError("Invalid recovery code entered!");
+								}
+							});
 					} else {
 						// if no 2FA, just log the user in
 						props.login(r.user_id, r.key);
-						navigate("/");
 					}
 				}
 			});
@@ -115,8 +127,8 @@ function Login(props: {
 					//only show if 2FA is enabled
 					totp ? (
 						<>
+							<h3>Two-Factor Authentication</h3>
 							<span className="red">
-								<h3>Two-Factor Authentication</h3>
 								Only <b>ONE</b> of the below options is required
 							</span>
 							<div className="grid">
@@ -132,9 +144,7 @@ function Login(props: {
 									/>
 								</div>
 								<div className="right">
-									<label>
-										Enter one of your recovery codes (8 alphanumeric characters)
-									</label>
+									<label>Enter a recovery code (8 alphanumeric chars)</label>
 									<input
 										type="text"
 										placeholder="Enter your recovery code"
@@ -158,9 +168,7 @@ function Login(props: {
 					// only allow the user to login if email is valid and password exists, and if totp has been entered (where relevant)
 					!emailRegex.test(email) ||
 					!password ||
-					(totp &&
-						totpCode.toString().length != 6 &&
-						recoveryCode.toString().length != 8)
+					(totp && totpCode.length != 6 && recoveryCode.length != 8)
 				}
 			>
 				Login

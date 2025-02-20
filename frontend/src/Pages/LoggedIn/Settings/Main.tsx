@@ -8,7 +8,7 @@ function Settings(props: { dark: boolean; user: User }) {
 	return (
 		<>
 			<Logo dark={props.dark} />
-			<h1>BoltPass Password Manager - Account Settings</h1>
+			<h1>Account Settings</h1>
 			<div className="grid">
 				<div>
 					<h2>Change Email</h2>
@@ -22,9 +22,9 @@ function Settings(props: { dark: boolean; user: User }) {
 				</div>
 				<div>
 					<h2>Two-Factor Authentication</h2>
-					<p>Active: {props.user.totp_enabled ? "Yes" : "No"}</p>
+					<p>Active: {props.user.tfa_enabled ? "Yes" : "No"}</p>
 					<button onClick={() => navigate("./2fa")}>
-						{props.user.totp_enabled ? "Disable" : "Enable"}
+						{props.user.tfa_enabled ? "Disable" : "Enable"}
 					</button>
 				</div>
 				<div>

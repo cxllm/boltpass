@@ -101,17 +101,3 @@ def decrypt(ciphertext: str, salt: str, iv: str, key: str) -> str:
     data = unpadder.update(padded_data) + unpadder.finalize()
 
     return data.decode()
-
-
-if __name__ == "__main__":
-    key = derive_key("Hello123!", "bd5ce17990eae13c678ef9e28eca8e25")
-    print(key, key[1], bytes.fromhex(key[1]) == key[0])
-    print(encrypt("hello", key[1]))
-    print(
-        decrypt(
-            "656f5f27445bee497635036cf04b8dc2",
-            "35c9c7e25b37e115051e15e4e0485f22",
-            "31b32dde3f0fe697799085dc37e0eda6",
-            key[1],
-        )
-    )

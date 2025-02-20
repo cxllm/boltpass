@@ -27,6 +27,7 @@ function SignUp(props: {
 	const navigate = useNavigate();
 
 	const signUp = () => {
+		setError("Please wait...");
 		fetch("/api/sign-up", {
 			method: "POST",
 			body: JSON.stringify({
@@ -39,18 +40,17 @@ function SignUp(props: {
 		})
 			.then((r) => r.json())
 			.then((r) => {
-				// Display relevant error message
-				switch (r.error) {
-					case "EMAIL_IN_USE":
-						setError("The email entered is already in use!");
-						break;
-					case undefined:
-						setError("");
-						break;
-					default:
-						setError("Internal Server Error");
-						break;
-				}
+				if (r.error) {
+					// Display relevant error message
+					switch (r.error) {
+						case "EMAIL_IN_USE":
+							setError("The email entered is already in use!");
+							break;
+						default:
+							setError("Internal Server Error");
+							break;
+					}
+				} else setError("");
 				// log the user in if it is a valid combination
 				if (r.key && r.user_id) {
 					props.login(r.user_id, r.key);

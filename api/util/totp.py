@@ -1,11 +1,11 @@
 import os
 import io
+import string
+import random
 import base64
 import datetime
 import pyotp
 import qrcode
-import string
-import random
 
 
 def generate_recovery_codes(codes_to_generate=8, length=8):
@@ -41,13 +41,12 @@ def generate_totp(name):
 
     # generate a uri to enter into a qr code for scanning by apps such as authy or google auth
     uri = totp.provisioning_uri(name, issuer_name="BoltPass")
-    print(uri)
 
     qr = qrcode.QRCode(
         version=1,  # size of qr code
         error_correction=qrcode.constants.ERROR_CORRECT_L,  # controls the error correction used
         box_size=10,  # number of pixels in each box
-        border=4,  # how many boxes thick the border should be
+        border=1,  # how many boxes thick the border should be
     )
     # add data to the qr code
     qr.add_data(uri)

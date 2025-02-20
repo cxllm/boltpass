@@ -57,7 +57,7 @@ def user_info_route(user_id):
                 "email": user.email,
                 "password_hash": user.password_hash,
                 "salt": user.salt,
-                "totp_enabled": user.totp_enabled,
+                "tfa_enabled": user.tfa_enabled,
                 "totp_secret": user.totp_secret,
             }
         )
