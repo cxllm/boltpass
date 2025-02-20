@@ -21,3 +21,12 @@ class RecoveryCode:
 
     def verify(self, code):
         return verify_password(code, self.salt, self.hashed)
+
+    def delete(self):
+        conn, cursor = connect()
+        cursor.execute(
+            "DELETE FROM recovery_codes WHERE user_id = %s AND code_id = %s",
+            (self.user_id, self.code_id),
+        )
+        conn.commit()
+        conn.close()

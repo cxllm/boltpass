@@ -233,6 +233,7 @@ class User:
             check = code.verify(to_verify)
             if check:
                 valid = True
+                code.delete()
                 break
         return valid
 
