@@ -10,13 +10,15 @@ import Login from "./Pages/Login";
 import SignUp from "./Pages/SignUp";
 import NavbarLoggedIn from "./Components/Navbar-LoggedIn";
 import LoggedInHome from "./Pages/LoggedIn/Home";
-import Passwords from "./Pages/LoggedIn/Passwords/Passwords";
+import Passwords from "./Pages/LoggedIn/Passwords/Main";
 import SecureNotes from "./Pages/LoggedIn/SecureNotes";
 import Settings from "./Pages/LoggedIn/Settings/Main";
 import DeleteAccount from "./Pages/LoggedIn/Settings/DeleteAccount";
 import Update2FA from "./Pages/LoggedIn/Settings/UpdateTOTP";
 import UpdateEmail from "./Pages/LoggedIn/Settings/UpdateEmail";
 import UpdatePassword from "./Pages/LoggedIn/Settings/UpdatePassword";
+import VerifyEmail from "./Pages/VerifyEmail";
+import EmailVerifed from "./Pages/EmailVerified";
 import About from "./Pages/About";
 
 export interface User {
@@ -158,6 +160,14 @@ function App() {
 								element={
 									loggedIn ? <Navigate to="/" /> : <SignUp dark={dark} login={logIn} />
 								}
+							/>
+							<Route
+								path="/verify-email"
+								element={loggedIn ? <Navigate to="/" /> : <VerifyEmail dark={dark} />}
+							/>
+							<Route
+								path="/email-verified"
+								element={loggedIn ? <Navigate to="/" /> : <EmailVerifed dark={dark} />}
 							/>
 							<Route
 								path="/user/passwords"

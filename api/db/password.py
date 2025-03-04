@@ -32,6 +32,7 @@ class Password:
         conn.close()
 
     def decrypt(self, key):
+        """"""
         return decrypt(self.encrypted, self.salt, self.iv, key)
 
     def add_totp(self, secret):

@@ -7,6 +7,7 @@ path = os.path.dirname(os.path.realpath(__file__ + "/.."))
 sys.path.insert(1, path)
 from util.password_hashing import verify_password, generate_hash
 from util.encryption import derive_key, encrypt
+from util.smtp import verification_email
 
 path = os.path.dirname(os.path.realpath(__file__))
 sys.path.insert(1, path)
@@ -77,10 +78,11 @@ class User:
         # put the data that is fetched from the database into the instance of the class
         self.user_id = data[0]
         self.email = data[1]
-        self.password_hash = data[2]
-        self.salt = data[3]
-        self.tfa_enabled = data[4]
-        self.totp_secret = data[5]
+        self.email_verified = data[2]
+        self.password_hash = data[3]
+        self.salt = data[4]
+        self.tfa_enabled = data[5]
+        self.totp_secret = data[6]
         self.passwords = []
         self.recovery_codes = []
         self.get_passwords()
@@ -108,6 +110,27 @@ class User:
                 key (str): The derived key in hex form
         """
         return derive_key(password, self.salt)[1]
+
+    def send_verification_email(self):
+        """
+        Sends an email to the user to verify their email
+        """
+        verification_email(self.email, self.user_id)
+
+    def verify_email(self):
+        """
+        Marks user's email as verified
+        """
+        self.email_verified = True
+        conn, cursor = connect()
+        cursor.execute(
+            """UPDATE users
+        SET email_verified = %s
+        WHERE user_id = %s""",
+            (self.email_verified, self.user_id),
+        )
+        conn.commit()
+        conn.close()
 
     def add_password(
         self, name, password, key, website=None, totp_secret=None, folder_name=None
@@ -267,9 +290,9 @@ def create_user(email, password):
     # insert these values into the database
     cursor.execute(
         """INSERT INTO users VALUES (
-            %s, %s, %s, %s, %s, %s
+            %s, %s, %s, %s, %s, %s, %s
         )""",
-        (user_id, email, hashed, salt, False, None),
+        (user_id, email, False, hashed, salt, False, None),
     )
     conn.commit()
     conn.close()

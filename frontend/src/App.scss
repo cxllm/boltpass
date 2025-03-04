@@ -252,6 +252,11 @@ body {
 	.green {
 		color: var(--dark-green);
 	}
+	form {
+		input {
+			color: #fff !important;
+		}
+	}
 }
 
 a,

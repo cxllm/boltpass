@@ -53,8 +53,7 @@ function SignUp(props: {
 				} else setError("");
 				// log the user in if it is a valid combination
 				if (r.key && r.user_id) {
-					props.login(r.user_id, r.key);
-					navigate("/");
+					navigate("/verify-email");
 				}
 			});
 	};
@@ -66,7 +65,7 @@ function SignUp(props: {
 				Already have an account? <Link to="/login">Login</Link>
 			</p>
 			<form className="login">
-				<label>Email: </label>
+				<label>Email (this will be verified): </label>
 				<input
 					type="email"
 					placeholder="Enter your email address"

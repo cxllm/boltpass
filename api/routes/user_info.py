@@ -57,6 +57,7 @@ def user_info_route(user_id):
             {
                 "user_id": user.user_id,
                 "email": user.email,
+                "email_verified": user.email_verified,
                 "password_hash": user.password_hash,
                 "salt": user.salt,
                 "tfa_enabled": user.tfa_enabled,

@@ -1,4 +1,4 @@
-def merge_sort(arr, by_key):
+def merge_sort(arr: list, by_key: str) -> list:
     # base case: if the array has one or zero elements, it is already sorted
     if len(arr) <= 1:
         return arr
@@ -12,7 +12,7 @@ def merge_sort(arr, by_key):
     return merge(left_half, right_half, by_key)
 
 
-def merge(left, right, by_key):
+def merge(left: list, right: list, by_key: str) -> list:
     sorted_array = []
     left_index, right_index = 0, 0
 
