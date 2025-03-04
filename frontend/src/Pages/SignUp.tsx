@@ -2,17 +2,12 @@ import { useState } from "react";
 import { FaCheck, FaTimes } from "react-icons/fa";
 import { Link, useNavigate } from "react-router";
 import Logo from "../Components/Logo";
+import { emailRegex, passwordRegex } from "../regex.tsx";
 // Sign up page
 function SignUp(props: {
 	dark: boolean;
 	login: (userID: string, key: string) => void;
 }) {
-	// Regex to verify if an email is valid
-	const emailRegex =
-		/^[a-zA-Z0-9.!#$%&’*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/;
-	// Regex to verify if password is secure
-	const passwordRegex =
-		/^(?=.*[0-9])(?=.*[A-Z])(?=.*[a-z])(?=.*[^0-9A-Za-z]).{8,}$/;
 	// Regexes to find the individual problems with a password (no lowercase, uppercase, numbers or special chars)
 	const lowercaseRegex = /^.*[a-z]+.*$/;
 	const uppercaseRegex = /^.*[A-Z]+.*$/;

@@ -5,8 +5,7 @@ import re
 
 from flask import request, jsonify, Blueprint, redirect
 
-# Fixes issues with the hosting platform
-# This code will be present in many files to combat these issues
+# Fixes issues with imports
 path = os.path.dirname(os.path.realpath(__file__))
 sys.path.insert(1, path)
 
@@ -67,7 +66,7 @@ def sign_up_route():
         return jsonify(
             {"error": "INVALID_PASSWORD", "text": "Password is not secure enough"}
         )
-    user.send_verification_email()
+    user.send_verification_email(request.url_root)
     # return the data given by the create_user function
     return jsonify(
         {
@@ -114,7 +113,7 @@ def login_route():
                 }
             )
         elif not user.email_verified:
-            user.send_verification_email()
+            user.send_verification_email(request.url_root)
             return jsonify(
                 {
                     "error": "USER_EMAIL_NOT_VERIFIED",
@@ -123,8 +122,6 @@ def login_route():
             )
 
         else:
-            if not user.email_verified:
-                user.send_verification_email()
             # If password is correct, return their info with encryption key
             return jsonify(
                 {

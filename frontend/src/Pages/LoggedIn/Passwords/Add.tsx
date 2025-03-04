@@ -23,7 +23,7 @@ function AddPassword(props: { dark: boolean; user: User; getKey: () => void }) {
 		})
 			.then((r) => r.json())
 			.then((r) => {
-				return r;
+				console.log(r);
 			});
 	};
 	return (

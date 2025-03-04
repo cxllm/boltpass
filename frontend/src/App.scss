@@ -257,6 +257,11 @@ body {
 			color: #fff !important;
 		}
 	}
+	div.grid {
+		div {
+			background-color: var(--dark-bg);
+		}
+	}
 }
 
 a,

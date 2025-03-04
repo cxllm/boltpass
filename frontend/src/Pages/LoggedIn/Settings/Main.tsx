@@ -11,10 +11,10 @@ function Settings(props: { dark: boolean; user: User }) {
 			<h1>Account Settings</h1>
 			<div className="grid">
 				<div>
-					<h2>Change Email</h2>
+					<h2>Change Email Address</h2>
 					<p>Update your account's email for logging in and contact</p>
-					<p>Current Email: {props.user.email}</p>
-					<button onClick={() => navigate("./email")}>Change Email</button>
+					<p>Current Email Address: {props.user.email}</p>
+					<button onClick={() => navigate("./email")}>Change Email Address</button>
 				</div>
 				<div>
 					<h2>Change Password</h2>

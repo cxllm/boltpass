@@ -1,12 +1,125 @@
 import { User } from "../../../App";
 import Logo from "../../../Components/Logo";
+import { useState } from "react";
+import { emailRegex } from "../../../regex.tsx";
+
 // Currently a placeholder page until I create the real one.
 function UpdateEmail(props: { dark: boolean; user: User; logout: () => void }) {
+	const [email, setEmail] = useState("");
+	const [emailVerification, setEmailVerification] = useState("");
+	const [password, setPassword] = useState("");
+	const [error, setError] = useState("");
+	const [success, setSuccess] = useState(false);
+	const updateEmail = () => {
+		setError("Please wait...");
+		fetch(`/api/user/${props.user.user_id}/update-email?password=${password}`, {
+			method: "PUT",
+			body: JSON.stringify({
+				email
+			})
+		})
+			.then((r) => r.json())
+			.then((r) => {
+				if (r.error) {
+					switch (r.error) {
+						case "PASSWORD_NOT_CORRECT":
+							setError("Incorrect password entered!");
+							break;
+						case "EMAIL_IN_USE":
+							setError("This email is already in use!");
+							break;
+						default:
+							setError("Internal server error");
+							break;
+					}
+				} else if (r.success) {
+					setError("");
+					setSuccess(true);
+					setTimeout(() => {
+						props.logout();
+					}, 15000);
+				}
+			});
+	};
 	return (
 		<>
 			<Logo dark={props.dark} />
-			<h1>BoltPass Password Manager</h1>
-			<p>The secure solution to your online needs</p>
+			<h1>Update Email Address</h1>
+			{success ? (
+				<>
+					<h2 className="green">
+						Your email address has been changed to {email}. You will be logged out in
+						15 seconds. To log in again, please verify your email address by following
+						the instructions sent to your inbox and enter your credentials on the
+						login page.
+					</h2>
+					<p>
+						Click <a onClick={props.logout}>here</a> to logout now
+					</p>
+				</>
+			) : (
+				<>
+					<form className="login">
+						<label>Enter your new email (this will be verified): </label>
+						<input
+							type="email"
+							placeholder="Enter your email address"
+							required
+							onInput={(v) => setEmail(v.currentTarget.value)}
+						/>
+						{
+							// only display if anything has been entered
+							email ? (
+								// check if email is valid and display an error message if not
+								emailRegex.test(email) ? (
+									<span className="green">Email is valid!</span>
+								) : (
+									<span className="red">Email is not valid</span>
+								)
+							) : (
+								""
+							)
+						}
+						<label>Please confirm your new email: </label>
+						<input
+							type="email"
+							placeholder="Enter your email address again"
+							required
+							onInput={(v) => setEmailVerification(v.currentTarget.value)}
+						/>
+						{
+							// only display if anything has been entered
+							emailVerification ? (
+								// check if emails match and display an error message if not
+								email === emailVerification ? (
+									<span className="green">Emails match!</span>
+								) : (
+									<span className="red">Emails do not match</span>
+								)
+							) : (
+								""
+							)
+						}
+						<label>Password: </label>
+						<input
+							type="password"
+							placeholder="Enter your password"
+							required
+							onInput={(v) => setPassword(v.currentTarget.value)}
+						/>
+					</form>
+					<button
+						onClick={updateEmail}
+						disabled={
+							// only allow the user to sign up if the emails match, are valid and a password has been entered
+							!(emailRegex.test(email) && email === emailVerification) || !password
+						}
+					>
+						Change Email Address
+					</button>
+					{error ? <span className="red">{error}</span> : ""}{" "}
+				</>
+			)}
 		</>
 	);
 }

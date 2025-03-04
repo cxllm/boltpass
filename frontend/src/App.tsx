@@ -105,9 +105,9 @@ function App() {
 		// Get rid of user id and key values when user logs out
 		window.localStorage.removeItem("userID");
 		window.localStorage.removeItem("key");
+		// redirect to home page or custom page
 		setLoggedIn(false);
 		setUser({});
-		// redirect to home page
 		return <Navigate to="/" />;
 	};
 	const getKey = () => {

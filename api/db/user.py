@@ -111,11 +111,11 @@ class User:
         """
         return derive_key(password, self.salt)[1]
 
-    def send_verification_email(self):
+    def send_verification_email(self, url):
         """
         Sends an email to the user to verify their email
         """
-        verification_email(self.email, self.user_id)
+        verification_email(self.email, self.user_id, url)
 
     def verify_email(self):
         """
@@ -125,12 +125,26 @@ class User:
         conn, cursor = connect()
         cursor.execute(
             """UPDATE users
-        SET email_verified = %s
-        WHERE user_id = %s""",
+            SET email_verified = %s
+            WHERE user_id = %s""",
             (self.email_verified, self.user_id),
         )
         conn.commit()
         conn.close()
+
+    def update_email(self, email, url):
+        self.email_verified = False
+        self.email = email
+        conn, cursor = connect()
+        cursor.execute(
+            """UPDATE users
+            SET email_verified = %s, email_address = %s
+            WHERE user_id = %s""",
+            (self.email_verified, self.email, self.user_id),
+        )
+        conn.commit()
+        conn.close()
+        self.send_verification_email(url)
 
     def add_password(
         self, name, password, key, website=None, totp_secret=None, folder_name=None
@@ -141,6 +155,8 @@ class User:
                 self: Refers to the specific instance of the class
                 password (str): Password to encrypt
                 key (str): Encryption key to use
+            Returns:
+                password (Password): The instance of the Password class for the password just added
         """
         # encrypt the password using AES
         encrypted, salt, iv = encrypt(password, key)

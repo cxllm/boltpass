@@ -4,8 +4,7 @@ import os
 from flask import Flask, request, jsonify, render_template
 from flask_cors import CORS
 
-# Fixes issues with the hosting platform
-# This code will be present in many files to combat these issues
+# Fixes issues with imports
 path = os.path.dirname(os.path.realpath(__file__))
 sys.path.insert(1, path)
 
@@ -18,6 +17,9 @@ from util.totp import verify as verify_totp, generate_totp, generate_code
 
 from routes.user_management import user_management
 from routes.user_info import user_info
+from routes.user_2fa import user_2fa
+from routes.passwords import passwords
+from routes.user_email import user_email
 
 # gets default values from the password generator function
 default_length, default_uppercase, default_numbers, default_specialchars = (
@@ -40,6 +42,9 @@ CORS(app)
 # Routes in a separate file to keep the main file uncluttered
 app.register_blueprint(user_management)
 app.register_blueprint(user_info)
+app.register_blueprint(user_2fa)
+app.register_blueprint(passwords)
+app.register_blueprint(user_email)
 
 
 @app.get("/")

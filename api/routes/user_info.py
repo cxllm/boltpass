@@ -1,10 +1,10 @@
 import sys
 import os
 from flask import request, jsonify, Blueprint
+from user_management import emailRegex
 
 
-# Fixes issues with the hosting platform
-# This code will be present in many files to combat these issues
+# Fixes issues with imports
 path = os.path.dirname(os.path.realpath(__file__))
 sys.path.insert(1, path)
 from db.user import (

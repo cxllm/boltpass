@@ -3,8 +3,7 @@ import os
 from flask import request, jsonify, Blueprint
 
 
-# Fixes issues with the hosting platform
-# This code will be present in many files to combat these issues
+# Fixes issues with imports
 path = os.path.dirname(os.path.realpath(__file__))
 sys.path.insert(1, path)
 from db.user import (
@@ -51,4 +50,4 @@ def user_passwords_route(user_id):
 
 @passwords.post("/api/user/<user_id>/password")
 def add_password_route(user_id):
-    key = 
+    key = request.args.get("key")

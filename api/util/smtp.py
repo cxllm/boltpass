@@ -37,8 +37,8 @@ def send_email(destination, subject, html_content, text_content):
         server.sendmail(email, destination, message.as_string())
 
 
-def verification_email(user_email, user_id):
-    verification_link = f"https://boltpass.vercel.app/api/user/{user_id}/verify-user-email?email={user_email}"
+def verification_email(user_email, user_id, url):
+    verification_link = f"{url}api/user/{user_id}/verify-email?email={user_email}"
     html = f"""
 <html>
     <body>
