@@ -3,7 +3,7 @@ import os
 import json
 import re
 
-from flask import request, jsonify, Blueprint
+from flask import request, jsonify, Blueprint, redirect
 
 # Fixes issues with the hosting platform
 # This code will be present in many files to combat these issues
@@ -22,7 +22,7 @@ from db.user import (
     EmailNotRegisteredError,
     InvalidUserIDError,
 )
-from util.totp import verify, generate_recovery_codes
+from util.totp import verify
 
 # Regex to verify if the email is valid
 emailRegex = r"^[a-zA-Z0-9.!#$%&’*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$"
@@ -67,11 +67,13 @@ def sign_up_route():
         return jsonify(
             {"error": "INVALID_PASSWORD", "text": "Password is not secure enough"}
         )
+    user.send_verification_email()
     # return the data given by the create_user function
     return jsonify(
         {
             "user_id": user.user_id,
             "email": user.email,
+            "email_verified": user.email_verified,
             "password_hash": user.password_hash,
             "salt": user.salt,
             "tfa_enabled": user.tfa_enabled,
@@ -111,12 +113,24 @@ def login_route():
                     "text": "The password entered is invalid",
                 }
             )
+        elif not user.email_verified:
+            user.send_verification_email()
+            return jsonify(
+                {
+                    "error": "USER_EMAIL_NOT_VERIFIED",
+                    "text": "User email not verfied, user has been sent a verification email",
+                }
+            )
+
         else:
+            if not user.email_verified:
+                user.send_verification_email()
             # If password is correct, return their info with encryption key
             return jsonify(
                 {
                     "user_id": user.user_id,
                     "email": user.email,
+                    "email_verified": user.email_verified,
                     "password_hash": user.password_hash,
                     "salt": user.salt,
                     "tfa_enabled": user.tfa_enabled,
@@ -289,3 +303,19 @@ def verify_recovery_code_route(user_id):
                 "text": "The user ID entered is not valid",
             }
         )
+
+
+@user_management.get("/api/user/<user_id>/verify-user-email")
+def verify_user_email_route(user_id):
+    email = request.args.get("email")
+    user = User(user_id=user_id)
+    if user.email != email:
+        return jsonify(
+            {
+                "error": "EMAIL_DOES_NOT_MATCH",
+                "text": "email does not match with the one being verified",
+            }
+        )
+    if not user.email_verified:
+        user.verify_email()
+    return redirect("/email-verified")

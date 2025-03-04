@@ -28,6 +28,7 @@ def create_tables(cursor):
         PRIMARY KEY (user_id),
         user_id TEXT NOT NULL,
         email_address TEXT UNIQUE NOT NULL,
+        email_verified BOOLEAN NOT NULL,
         password_hash TEXT NOT NULL,
         password_salt TEXT NOT NULL,
         tfa_enabled BOOLEAN NOT NULL,

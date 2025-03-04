@@ -8,9 +8,20 @@ import pyotp
 import qrcode
 
 
-def generate_recovery_codes(codes_to_generate=8, length=8):
-    alphabet = string.ascii_lowercase + string.digits
+def generate_recovery_codes(codes_to_generate: int = 8, length: int = 8):
+    """
+    Generates a random string of recovery codes
+
+        Parameters:
+            codes_to_generate (int): The number of codes to generate
+            length (int): How long you want the codes to be
+
+        Returns:
+            codes (list): The generated recovery codes
+    """
+    alphabet = string.ascii_lowercase + string.digits  # the alphabet to use
     codes = []
+    # generate all of the codes randomly
     for _ in range(codes_to_generate):
         code = ""
         for _ in range(length):

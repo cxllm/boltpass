@@ -1,4 +1,4 @@
-import { Link } from "react-router";
+import { Link, useNavigate } from "react-router";
 import { useState } from "react";
 import Logo from "../Components/Logo";
 
@@ -17,6 +17,7 @@ function Login(props: {
 	const [totp, setTotp] = useState(false);
 	const [totpCode, setTotpCode] = useState("");
 	const [recoveryCode, setRecoveryCode] = useState("");
+	const navigate = useNavigate();
 	const login = () => {
 		setError("Please wait...");
 		fetch(`/api/login?email=${email}&password=${password}`)
@@ -28,6 +29,9 @@ function Login(props: {
 						case "EMAIL_NOT_REGISTERED":
 						case "PASSWORD_NOT_CORRECT":
 							setError("The email and password combination is incorrect!");
+							break;
+						case "USER_EMAIL_NOT_VERIFIED":
+							navigate("/verify-email");
 							break;
 						default:
 							setError("Internal Server Error");

@@ -17,6 +17,8 @@ import DeleteAccount from "./Pages/LoggedIn/Settings/DeleteAccount";
 import Update2FA from "./Pages/LoggedIn/Settings/UpdateTOTP";
 import UpdateEmail from "./Pages/LoggedIn/Settings/UpdateEmail";
 import UpdatePassword from "./Pages/LoggedIn/Settings/UpdatePassword";
+import VerifyEmail from "./Pages/VerifyEmail";
+import EmailVerifed from "./Pages/EmailVerified";
 
 export interface User {
 	user_id?: string;
@@ -148,6 +150,14 @@ function App() {
 								element={
 									loggedIn ? <Navigate to="/" /> : <SignUp dark={dark} login={logIn} />
 								}
+							/>
+							<Route
+								path="/verify-email"
+								element={loggedIn ? <Navigate to="/" /> : <VerifyEmail dark={dark} />}
+							/>
+							<Route
+								path="/email-verified"
+								element={loggedIn ? <Navigate to="/" /> : <EmailVerifed dark={dark} />}
 							/>
 							<Route
 								path="/user/passwords"
