@@ -61,6 +61,7 @@ def create_tables(cursor):
         TOTP_secret TEXT,
         website TEXT,
         name TEXT NOT NULL,
+        username TEXT NOT NULL,
         FOREIGN KEY(user_id, folder_name) REFERENCES folders(user_id, folder_name),
         FOREIGN KEY(user_id) REFERENCES users(user_id)
     )""",

@@ -67,6 +67,9 @@ export default class Navigation extends Component<
 							<Nav.Link eventKey="/" as={Link} to="/">
 								Home
 							</Nav.Link>
+							<Nav.Link eventKey="/about" as={Link} to="/about">
+								About BoltPass
+							</Nav.Link>
 							<Nav.Link
 								eventKey="/password-generator"
 								as={Link}

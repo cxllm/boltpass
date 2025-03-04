@@ -26,4 +26,3 @@ dist-ssr
 .vercel
 __pycache__
 .env
-tmp.txt

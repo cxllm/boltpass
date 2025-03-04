@@ -10,13 +10,14 @@ import Login from "./Pages/Login";
 import SignUp from "./Pages/SignUp";
 import NavbarLoggedIn from "./Components/Navbar-LoggedIn";
 import LoggedInHome from "./Pages/LoggedIn/Home";
-import Passwords from "./Pages/LoggedIn/Passwords";
+import Passwords from "./Pages/LoggedIn/Passwords/Passwords";
 import SecureNotes from "./Pages/LoggedIn/SecureNotes";
 import Settings from "./Pages/LoggedIn/Settings/Main";
 import DeleteAccount from "./Pages/LoggedIn/Settings/DeleteAccount";
 import Update2FA from "./Pages/LoggedIn/Settings/UpdateTOTP";
 import UpdateEmail from "./Pages/LoggedIn/Settings/UpdateEmail";
 import UpdatePassword from "./Pages/LoggedIn/Settings/UpdatePassword";
+import About from "./Pages/About";
 
 export interface User {
 	user_id?: string;
@@ -107,6 +108,14 @@ function App() {
 		// redirect to home page
 		return <Navigate to="/" />;
 	};
+	const getKey = () => {
+		const key = getItemFromLocalStorage("key");
+		if (!key) {
+			logOut();
+		} else {
+			return key;
+		}
+	};
 	return (
 		<>
 			<BrowserRouter>
@@ -133,6 +142,7 @@ function App() {
 									)
 								}
 							/>
+							<Route path="/about" element={<About dark={dark} />} />
 							<Route
 								path="/password-generator"
 								element=<PasswordGenerator dark={dark} />
@@ -153,7 +163,7 @@ function App() {
 								path="/user/passwords"
 								element={
 									loggedIn && user ? (
-										<Passwords dark={dark} user={user} />
+										<Passwords dark={dark} user={user} getKey={getKey} />
 									) : (
 										<Navigate to="/login" />
 									)

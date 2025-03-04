@@ -12,10 +12,10 @@ from db.user import (
     InvalidUserIDError,
 )
 
-user_info = Blueprint("user_info", __name__)
+passwords = Blueprint("passwords", __name__)
 
 
-@user_info.get("/api/user/<user_id>/passwords")
+@passwords.get("/api/user/<user_id>/passwords")
 def user_passwords_route(user_id):
     key = request.args.get("key")
     if not key:
@@ -49,21 +49,6 @@ def user_passwords_route(user_id):
         )
 
 
-@user_info.get("/api/user/<user_id>")
-def user_info_route(user_id):
-    try:
-        user = User(user_id=user_id)
-        return jsonify(
-            {
-                "user_id": user.user_id,
-                "email": user.email,
-                "password_hash": user.password_hash,
-                "salt": user.salt,
-                "tfa_enabled": user.tfa_enabled,
-                "totp_secret": user.totp_secret,
-            }
-        )
-    except InvalidUserIDError:
-        return jsonify(
-            {"error": "USER_ID_INVALID", "text": "This user ID was not recognised."}
-        )
+@passwords.post("/api/user/<user_id>/password")
+def add_password_route(user_id):
+    key = 

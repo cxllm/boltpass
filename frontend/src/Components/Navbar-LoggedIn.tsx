@@ -68,6 +68,9 @@ export default class NavigationLoggedIn extends Component<
 							<Nav.Link eventKey="/" as={Link} to="/">
 								Home
 							</Nav.Link>
+							<Nav.Link eventKey="/about" as={Link} to="/about">
+								About BoltPass
+							</Nav.Link>
 							<Nav.Link eventKey="/user/passwords" as={Link} to="/user/passwords">
 								Passwords
 							</Nav.Link>
