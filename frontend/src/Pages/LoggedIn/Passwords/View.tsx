@@ -70,9 +70,11 @@ function ViewPassword(props: {
 	};
 	if (!passwordInfo) getPassword();
 	if (passwordInfo?.totp_secret && !tfaCode) {
-		get2FACode();
+		get2FACode(); // generate code on loading the website
+		// The interval used in the timeout means that the code is refreshed whenever the next minute passes or the next 30 seconds past the minute passes
 		setTimeout(() => {
 			get2FACode();
+			// set the interval after the timeout to be every 30 seconds, so on the minute and on 30 seconds past the minute
 			setInterval(() => {
 				get2FACode();
 			}, 30000);
