@@ -121,6 +121,7 @@ function ViewPassword(props: {
 							<h2>Details</h2>
 							<p>Name: {passwordInfo.name}</p>
 							<p>Folder: {passwordInfo.folder_name || "None"}</p>
+							<p>Website: {passwordInfo.website || "None"}</p>
 							<p>
 								2FA Code:{" "}
 								{tfaCode ? (
@@ -133,8 +134,7 @@ function ViewPassword(props: {
 											}}
 										>
 											{copiedCode ? <FaCheck /> : <FaCopy />}
-										</a>
-										<br />
+										</a>{" "}
 										<span className="red">
 											Refreshes in {timeLeftOnCode} second{timeLeftOnCode != 1 ? "s" : ""}
 										</span>
