@@ -8,6 +8,10 @@ from util.encryption import decrypt, encrypt
 from util.totp import generate_code
 
 
+class InvalidPasswordIDError(Exception):
+    pass
+
+
 class Password:
     def __init__(self, user_id, password_id):
         self.user_id = user_id
@@ -17,18 +21,21 @@ class Password:
             "SELECT * FROM passwords WHERE user_id=%s AND password_id=%s",
             (self.user_id, self.password_id),
         )
+        data = cursor.fetchone()
+        if data is None:
+            raise InvalidPasswordIDError
         (
             _,
             _,
             self.encrypted,
             self.salt,
             self.iv,
+            self.username,
+            self.name,
             self.folder_name,
             self.totp_secret,
             self.website,
-            self.name,
-            self.username,
-        ) = cursor.fetchone()
+        ) = data
         conn.close()
 
     def decrypt(self, key):

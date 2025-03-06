@@ -20,6 +20,8 @@ import UpdatePassword from "./Pages/LoggedIn/Settings/UpdatePassword";
 import VerifyEmail from "./Pages/VerifyEmail";
 import EmailVerifed from "./Pages/EmailVerified";
 import About from "./Pages/About";
+import AddPassword from "./Pages/LoggedIn/Passwords/Add";
+import ViewPassword from "./Pages/LoggedIn/Passwords/View";
 
 export interface User {
 	user_id?: string;
@@ -174,6 +176,26 @@ function App() {
 								element={
 									loggedIn && user ? (
 										<Passwords dark={dark} user={user} getKey={getKey} />
+									) : (
+										<Navigate to="/login" />
+									)
+								}
+							/>
+							<Route
+								path="/user/passwords/add"
+								element={
+									loggedIn && user ? (
+										<AddPassword dark={dark} user={user} getKey={getKey} />
+									) : (
+										<Navigate to="/login" />
+									)
+								}
+							/>
+							<Route
+								path="/user/passwords/:passwordID"
+								element={
+									loggedIn && user ? (
+										<ViewPassword dark={dark} user={user} getKey={getKey} />
 									) : (
 										<Navigate to="/login" />
 									)

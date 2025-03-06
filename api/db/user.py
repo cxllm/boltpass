@@ -147,7 +147,14 @@ class User:
         self.send_verification_email(url)
 
     def add_password(
-        self, name, password, key, website=None, totp_secret=None, folder_name=None
+        self,
+        name,
+        password,
+        key,
+        username,
+        website=None,
+        totp_secret=None,
+        folder_name=None,
     ):
         """
         Add a password to the database
@@ -161,12 +168,12 @@ class User:
         # encrypt the password using AES
         encrypted, salt, iv = encrypt(password, key)
         # assign the password a random ID
-        password_id = uuid.uuid4()
+        password_id = str(uuid.uuid4())
         # add to the database
         conn, cursor = connect()
         cursor.execute(
-            """INSERT INTO password VALUES (
-                %s, %s, %s, %s, %s, %s
+            """INSERT INTO passwords VALUES (
+                %s, %s, %s, %s, %s, %s, %s, %s, %s, %s
             )""",
             (
                 self.user_id,
@@ -174,12 +181,14 @@ class User:
                 encrypted,
                 salt,
                 iv,
+                username,
+                name,
                 folder_name,
                 totp_secret,
                 website,
-                name,
             ),
         )
+        conn.commit()
         conn.close()
         password = Password(user_id=self.user_id, password_id=password_id)
         self.passwords.append(password)

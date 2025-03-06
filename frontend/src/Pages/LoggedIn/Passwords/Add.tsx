@@ -1,15 +1,23 @@
 import { useState } from "react";
 import { User } from "../../../App";
 import Logo from "../../../Components/Logo";
+import { useNavigate } from "react-router";
 
-function AddPassword(props: { dark: boolean; user: User; getKey: () => void }) {
+function AddPassword(props: {
+	dark: boolean;
+	user: User;
+	getKey: () => string;
+}) {
 	const [password, setPassword] = useState("");
 	const [username, setUsername] = useState("");
 	const [name, setName] = useState("");
 	const [website, setWebsite] = useState("");
 	const [totpSecret, setTotpSecret] = useState("");
 	const [folder, setFolder] = useState("");
+	const [error, setError] = useState("");
+	const navigate = useNavigate();
 	const addPassword = () => {
+		setError("Please wait");
 		fetch(`/api/user/${props.user.user_id}/password?key=${props.getKey()}`, {
 			method: "POST",
 			body: JSON.stringify({
@@ -23,7 +31,11 @@ function AddPassword(props: { dark: boolean; user: User; getKey: () => void }) {
 		})
 			.then((r) => r.json())
 			.then((r) => {
-				console.log(r);
+				if (r.error) {
+					setError("Internal server error");
+				} else {
+					return navigate(`/user/passwords/${r.password_id}`);
+				}
 			});
 	};
 	return (
@@ -87,6 +99,7 @@ function AddPassword(props: { dark: boolean; user: User; getKey: () => void }) {
 			<button onClick={addPassword} disabled={!password || !username || !name}>
 				Add Password
 			</button>
+			{error ? <span className="red">{error}</span> : ""}
 		</>
 	);
 }

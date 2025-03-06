@@ -58,11 +58,11 @@ def create_tables(cursor):
         encrypted_password TEXT NOT NULL,
         salt TEXT NOT NULL,
         iv TEXT NOT NULL,
+        username TEXT NOT NULL,
+        name TEXT NOT NULL,
         folder_name TEXT,
         TOTP_secret TEXT,
         website TEXT,
-        name TEXT NOT NULL,
-        username TEXT NOT NULL,
         FOREIGN KEY(user_id, folder_name) REFERENCES folders(user_id, folder_name),
         FOREIGN KEY(user_id) REFERENCES users(user_id)
     )""",
