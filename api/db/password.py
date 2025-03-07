@@ -39,7 +39,6 @@ class Password:
         conn.close()
 
     def decrypt(self, key):
-        """"""
         return decrypt(self.encrypted, self.salt, self.iv, key)
 
     def add_totp(self, secret):
@@ -63,7 +62,7 @@ class Password:
         cursor.execute(
             """UPDATE passwords
             SET encrypted_password = %s, salt = %s, iv = %s
-            WHERE password_id = %s, user_id = %s""",
+            WHERE password_id = %s AND user_id = %s""",
             (self.encrypted, self.salt, self.iv, self.password_id, self.user_id),
         )
         conn.commit()
@@ -73,8 +72,9 @@ class Password:
     def change_folder(self, folder_name=None):
         conn, cursor = connect()
         if folder_name:
+            folder_name = folder_name.capitalize()
             cursor.execute(
-                """SELECT * FROM folders WHERE user_id=%s, folder_name=%s""",
+                """SELECT * FROM folders WHERE user_id=%s AND folder_name=%s""",
                 (self.user_id, folder_name),
             )
             if cursor.fetchone() is None:
@@ -112,7 +112,7 @@ class Password:
             cursor.execute(
                 """UPDATE passwords
                 SET name=%s, website=%s, totp_secret=%s, username=%s
-                WHERE password_id=%s, user_id=%s""",
+                WHERE password_id=%s AND user_id=%s""",
                 (
                     self.name,
                     self.website,
@@ -125,3 +125,30 @@ class Password:
             conn.commit()
             conn.close()
         return self.website, self.name, self.totp_secret, self.username
+
+    def delete(self):
+        conn, cursor = connect()
+
+        cursor.execute(
+            """DELETE FROM passwords WHERE password_id = %s AND user_id = %s""",
+            (self.password_id, self.user_id),
+        )
+        if self.folder_name:
+            cursor.execute(
+                """SELECT * FROM passwords WHERE folder_name = %s AND user_id = %s""",
+                (self.folder_name, self.user_id),
+            )
+            if len(cursor.fetchall()) == 0:
+                # If this password is the last one in the folder, delete the folder
+                cursor.execute(
+                    """DELETE FROM folders WHERE folder_name = %s AND user_id = %s""",
+                    (self.folder_name, self.user_id),
+                )
+        cursor.execute(
+            """SELECT * FROM passwords WHERE password_id = %s AND user_id = %s""",
+            (self.password_id, self.user_id),
+        )
+        out = cursor.fetchone()
+        conn.commit()
+        conn.close()
+        return out is None

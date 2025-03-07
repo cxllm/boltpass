@@ -8,6 +8,7 @@ sys.path.insert(1, path)
 from util.password_hashing import verify_password, generate_hash
 from util.encryption import derive_key, encrypt
 from util.smtp import verification_email
+from db.folder import create_folder
 
 path = os.path.dirname(os.path.realpath(__file__))
 sys.path.insert(1, path)
@@ -85,6 +86,7 @@ class User:
         self.totp_secret = data[6]
         self.passwords = []
         self.recovery_codes = []
+        self.folders = []
         self.get_passwords()
         self.get_recovery_codes()
 
@@ -171,6 +173,14 @@ class User:
         password_id = str(uuid.uuid4())
         # add to the database
         conn, cursor = connect()
+        if folder_name:
+            folder_name = folder_name.capitalize()
+            cursor.execute(
+                "SELECT * FROM folders WHERE folder_name = %s AND user_id = %s",
+                (folder_name, self.user_id),
+            )
+            if cursor.fetchone() is None:
+                create_folder(self.user_id, folder_name)
         cursor.execute(
             """INSERT INTO passwords VALUES (
                 %s, %s, %s, %s, %s, %s, %s, %s, %s, %s

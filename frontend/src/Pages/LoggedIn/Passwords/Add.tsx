@@ -32,6 +32,7 @@ function AddPassword(props: {
 			.then((r) => r.json())
 			.then((r) => {
 				if (r.error) {
+					console.log(r.error);
 					setError("Internal server error");
 				} else {
 					return navigate(`/user/passwords/${r.password_id}`);

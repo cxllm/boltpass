@@ -1,18 +1,9 @@
 import { useState } from "react";
 import { User } from "../../../App";
 import Logo from "../../../Components/Logo";
-import { useParams } from "react-router";
+import { useParams, useNavigate, Link } from "react-router";
 import { FaCopy, FaCheck } from "react-icons/fa6";
-
-interface Password {
-	decrypted: string;
-	password_id: string;
-	name: string;
-	folder_name: string;
-	website: string;
-	username: string;
-	totp_secret: string;
-}
+import { Password } from "./Main";
 function ViewPassword(props: {
 	dark: boolean;
 	user: User;
@@ -26,6 +17,8 @@ function ViewPassword(props: {
 	const [copiedPass, setCopiedPass] = useState(false);
 	const [copiedCode, setCopiedCode] = useState(false);
 	const [tfaCode, setTfaCode] = useState("");
+	const [deletePressed, setDeletePressed] = useState(0);
+	const navigate = useNavigate();
 	const getCodeValidTime = () => {
 		return 30 - (Math.floor(Date.now() / 1000) % 30);
 	};
@@ -54,11 +47,30 @@ function ViewPassword(props: {
 				}
 			});
 	};
+	const deletePassword = () => {
+		fetch(
+			`/api/user/${
+				props.user.user_id
+			}/password/${passwordID}?key=${props.getKey()}`,
+			{
+				method: "DELETE"
+			}
+		)
+			.then((r) => r.json())
+			.then((r) => {
+				if (r.error) {
+					setError("Internal server error");
+				} else {
+					if (r) {
+						navigate("/user/passwords");
+					}
+				}
+			});
+	};
 	const get2FACode = async () => {
 		if (!passwordInfo?.totp_secret) {
 			return null;
 		}
-		console.log(new Date().toTimeString());
 		const data = await (
 			await fetch(`/api/generate-totp-code?secret=${passwordInfo.totp_secret}`)
 		).json();
@@ -88,6 +100,7 @@ function ViewPassword(props: {
 		<>
 			<Logo dark={props.dark} />
 			<h1>Password Details {passwordInfo ? `- ${passwordInfo.name} ` : ""}</h1>
+			<Link to="/user/passwords">{"<<"} Back to Passwords</Link>
 			{passwordInfo ? (
 				<>
 					<div className="grid">
@@ -145,9 +158,41 @@ function ViewPassword(props: {
 							</p>
 						</div>
 					</div>
+					<div
+						style={{
+							display: "flex",
+							width: "fit-content",
+							marginLeft: "auto",
+							marginRight: "auto"
+						}}
+					>
+						<button
+							style={{ margin: "0.2rem" }}
+							onClick={() => navigate(`/user/passwords/${passwordID}/edit`)}
+						>
+							Edit Password
+						</button>
+
+						<button
+							style={{ backgroundColor: "red", margin: "0.2rem" }}
+							onClick={() => {
+								if (deletePressed == 1) {
+									deletePassword();
+								}
+								setDeletePressed(deletePressed + 1);
+							}}
+						>
+							{deletePressed == 1
+								? "Are you sure? Press again to confirm"
+								: deletePressed == 0
+								? "Delete this password"
+								: "Deleting your account..."}
+						</button>
+						<br />
+					</div>
 				</>
 			) : (
-				<h2>{error ? <span className="error">error</span> : "Loading..."}</h2>
+				<p>{error ? <span className="error">error</span> : "Loading..."}</p>
 			)}
 		</>
 	);

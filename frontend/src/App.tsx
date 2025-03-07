@@ -11,7 +11,6 @@ import SignUp from "./Pages/SignUp";
 import NavbarLoggedIn from "./Components/Navbar-LoggedIn";
 import LoggedInHome from "./Pages/LoggedIn/Home";
 import Passwords from "./Pages/LoggedIn/Passwords/Main";
-import SecureNotes from "./Pages/LoggedIn/SecureNotes";
 import Settings from "./Pages/LoggedIn/Settings/Main";
 import DeleteAccount from "./Pages/LoggedIn/Settings/DeleteAccount";
 import Update2FA from "./Pages/LoggedIn/Settings/UpdateTOTP";
@@ -22,6 +21,7 @@ import EmailVerifed from "./Pages/EmailVerified";
 import About from "./Pages/About";
 import AddPassword from "./Pages/LoggedIn/Passwords/Add";
 import ViewPassword from "./Pages/LoggedIn/Passwords/View";
+import EditPassword from "./Pages/LoggedIn/Passwords/Edit";
 
 export interface User {
 	user_id?: string;
@@ -202,10 +202,10 @@ function App() {
 								}
 							/>
 							<Route
-								path="/user/secure-notes"
+								path="/user/passwords/:passwordID/edit"
 								element={
 									loggedIn && user ? (
-										<SecureNotes dark={dark} user={user} />
+										<EditPassword dark={dark} user={user} getKey={getKey} />
 									) : (
 										<Navigate to="/login" />
 									)

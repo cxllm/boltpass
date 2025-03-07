@@ -4,9 +4,9 @@ def merge_sort(arr: list, by_key: str) -> list:
         return arr
 
     # split the array into two halves.
-    mid = len(arr) // 2  # truncate the middle so no decimals
-    left_half = merge_sort(arr[:mid], by_key)  # run algorithm again
-    right_half = merge_sort(arr[mid:], by_key)
+    mid = len(arr) // 2  # integer divide to find the middle so no decimals
+    left_half = merge_sort(arr[:mid], by_key)  # run algorithm again on left
+    right_half = merge_sort(arr[mid:], by_key)  # run algorithm again on right
 
     # merge the two sorted halves and return the result.
     return merge(left_half, right_half, by_key)
@@ -31,16 +31,3 @@ def merge(left: list, right: list, by_key: str) -> list:
     sorted_array.extend(right[right_index:])
 
     return sorted_array
-
-
-if __name__ == "__main__":
-    # example
-    array = [
-        {"test": "hajdkbjsdak", "password": "hUIDJHU"},
-        {"test": "zghaioknj", "password": "hUIDJHU"},
-        {"test": "aha", "password": "hUIDJHU"},
-        {"test": "aahan", "password": "hUIDJHU"},
-    ]
-    print("Original array:", array)
-    sorted_array = merge_sort(array, "test")
-    print("Sorted array:", sorted_array)

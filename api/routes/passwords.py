@@ -1,8 +1,8 @@
 import sys
 import os
-from flask import request, jsonify, Blueprint
 import json
-
+from flask import request, jsonify, Blueprint
+from util.merge_sort import merge_sort
 
 # Fixes issues with imports
 path = os.path.dirname(os.path.realpath(__file__))
@@ -40,6 +40,8 @@ def user_passwords_route(user_id):
                     "totp_secret": password.totp_secret,
                 }
             )
+        # Sort password by their name
+        p = merge_sort(p, "name")
         return jsonify(p)
     except InvalidUserIDError:
         return jsonify(
@@ -113,7 +115,7 @@ def add_password_route(user_id):
     name = data["name"]
     website = data["website"] if data["website"] else None
     totp_secret = data["totp_secret"] if data["totp_secret"] else None
-    folder_name = data["folder_name"] if data["folder"] in keys else None
+    folder_name = data["folder_name"].capitalize() if data["folder_name"] else None
     try:
         user = User(user_id=user_id)
         password = user.add_password(
@@ -134,3 +136,37 @@ def add_password_route(user_id):
         return jsonify(
             {"error": "USER_ID_INVALID", "text": "This user ID was not recognised."}
         )
+
+
+@passwords.delete("/api/user/<user_id>/password/<password_id>")
+def delete_password_route(user_id, password_id):
+    key = request.args.get("key")
+    if not key:
+        return jsonify(
+            {"error": "NO_KEY_ENTERED", "text": "No encryption key was provided."}
+        )
+    try:
+        _ = User(user_id=user_id)
+        password = Password(user_id, password_id)
+        password.decrypt(key)
+        return jsonify(password.delete())
+    except InvalidUserIDError:
+        return jsonify(
+            {"error": "USER_ID_INVALID", "text": "This user ID was not recognised."}
+        )
+    except InvalidPasswordIDError:
+        return jsonify(
+            {
+                "error": "PASSWORD_ID_INVALID",
+                "text": "This password ID was not recognised.",
+            }
+        )
+    except:
+        return jsonify(
+            {"error": "INVALID_KEY_ENTERED", "text": "The key entered is incorrect"}
+        )
+
+
+@passwords.put("/api/user/<user_id>/password/<password_id>")
+def edit_password_route(user_id, password_id):
+    pass
