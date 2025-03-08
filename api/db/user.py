@@ -134,11 +134,11 @@ class User:
             decrypted = p.decrypt(key)
             p.update_password(decrypted, new_key)
 
-    def send_verification_email(self, url):
+    def send_verification_email(self):
         """
         Sends an email to the user to verify their email
         """
-        verification_email(self.email, self.user_id, url)
+        verification_email(self.email, self.user_id)
 
     def verify_email(self):
         """
@@ -155,7 +155,7 @@ class User:
         conn.commit()
         conn.close()
 
-    def update_email(self, email, url):
+    def update_email(self, email):
         self.email_verified = False
         self.email = email
         conn, cursor = connect()
@@ -167,7 +167,7 @@ class User:
         )
         conn.commit()
         conn.close()
-        self.send_verification_email(url)
+        self.send_verification_email()
 
     def add_password(
         self,

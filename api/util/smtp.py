@@ -11,6 +11,7 @@ load_dotenv()
 email = os.getenv("EMAIL_USER")
 password = os.getenv("EMAIL_PASSWORD")
 smtp_server = os.getenv("SMTP_SERVER")
+domain = os.getenv("DOMAIN")
 
 
 def send_email(destination, subject, html_content, text_content):
@@ -37,8 +38,8 @@ def send_email(destination, subject, html_content, text_content):
         server.sendmail(email, destination, message.as_string())
 
 
-def verification_email(user_email, user_id, url):
-    verification_link = f"{url}api/user/{user_id}/verify-email?email={user_email}"
+def verification_email(user_email, user_id):
+    verification_link = f"{domain}api/user/{user_id}/verify-email?email={user_email}"
     html = f"""
 <html>
     <body>

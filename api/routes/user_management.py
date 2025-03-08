@@ -66,7 +66,7 @@ def sign_up_route():
         return jsonify(
             {"error": "INVALID_PASSWORD", "text": "Password is not secure enough"}
         )
-    user.send_verification_email(request.url_root)
+    user.send_verification_email()
     # return the data given by the create_user function
     return jsonify(
         {
@@ -113,7 +113,7 @@ def login_route():
                 }
             )
         elif not user.email_verified:
-            user.send_verification_email(request.url_root)
+            user.send_verification_email()
             return jsonify(
                 {
                     "error": "USER_EMAIL_NOT_VERIFIED",

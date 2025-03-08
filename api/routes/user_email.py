@@ -71,7 +71,7 @@ def update_user_email_route(user_id):
                     {"error": "EMAIL_IN_USE", "text": "Email is already in use"}
                 )
             except EmailNotRegisteredError:
-                user.update_email(email, request.root_url)
+                user.update_email(email)
                 return jsonify({"success": True})
     except InvalidUserIDError:
         return jsonify(
