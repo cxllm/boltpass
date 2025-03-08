@@ -39,7 +39,9 @@ def send_email(destination, subject, html_content, text_content):
 
 
 def verification_email(user_email, user_id):
-    verification_link = f"{domain}api/user/{user_id}/verify-email?email={user_email}"
+    verification_link = (
+        f"https://{domain}/api/user/{user_id}/verify-email?email={user_email}"
+    )
     html = f"""
 <html>
     <body>
