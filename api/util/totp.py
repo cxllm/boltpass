@@ -99,7 +99,7 @@ def verify(secret_key, code):
         return totp.verify(code, for_time=thirty_seconds_ago)
 
 
-def generate_code(secret_key):
+def generate_code(secret_key: str) -> str:
     """
     Generates a code for a TOTP secret for right now
 

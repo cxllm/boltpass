@@ -12,6 +12,7 @@ function EditPassword(props: {
 	const { passwordID } = useParams();
 	const [passwordInfo, setPasswordInfo] = useState<Password>();
 	const [error, setError] = useState("");
+	const [requestSent, setRequestSent] = useState(false);
 	const navigate = useNavigate();
 	const getPassword = () => {
 		fetch(
@@ -38,23 +39,26 @@ function EditPassword(props: {
 	};
 	const editPassword = () => {
 		setError("Updating password, please wait...");
-		fetch(
-			`/api/user/${
-				props.user.user_id
-			}/password/${passwordID}?key=${props.getKey()}`,
-			{
-				method: "PUT",
-				body: JSON.stringify(passwordInfo)
-			}
-		)
-			.then((r) => r.json())
-			.then((r) => {
-				if (r.error) {
-					setError("Internal server error");
-				} else {
-					navigate(`/user/passwords/${passwordID}`);
+		if (!requestSent) {
+			setRequestSent(true);
+			fetch(
+				`/api/user/${
+					props.user.user_id
+				}/password/${passwordID}?key=${props.getKey()}`,
+				{
+					method: "PUT",
+					body: JSON.stringify(passwordInfo)
 				}
-			});
+			)
+				.then((r) => r.json())
+				.then((r) => {
+					if (r.error) {
+						setError("Internal server error");
+					} else {
+						navigate(`/user/passwords/${passwordID}`);
+					}
+				});
+		}
 	};
 	if (!passwordInfo) getPassword();
 	return (

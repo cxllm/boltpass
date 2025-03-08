@@ -6,6 +6,7 @@ from dotenv import load_dotenv
 def connect():
     """
     Connect to the database
+
         Returns
             conn: The connection to the database
             cursor: The cursor for the database
@@ -27,11 +28,12 @@ def connect():
         return conn, conn.cursor()
 
 
-def create_tables(cursor):
+def create_tables(cursor) -> None:
     """
     Creates the tables in the database
-    Parameters:
-        cursor: The psycopg2 cursor
+
+        Parameters:
+            cursor: The psycopg2 cursor
     """
     tables = (
         """

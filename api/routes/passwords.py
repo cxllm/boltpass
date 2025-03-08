@@ -201,9 +201,11 @@ def edit_password_route(user_id, password_id):
         folder_name = data["folder_name"].capitalize() if data["folder_name"] else None
         if old != new:
             password.update_password(new, key)
-        password.update_information(website, name, totp_secret, username)
+        password.update_information(name, username, website, totp_secret)
         if folder_name != password.folder_name:
             password.change_folder(folder_name)
+        if totp_secret != password.totp_secret:
+            password.add_totp(totp_secret)
         return jsonify(
             {
                 "decrypted": password.decrypt(key),

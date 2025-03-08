@@ -8,13 +8,25 @@ from email.mime.text import MIMEText
 # Specify the port as the one for STARTTLS and load info from .env file
 port = 587
 load_dotenv()
+# Get the stored information from the .env file
 email = os.getenv("EMAIL_USER")
 password = os.getenv("EMAIL_PASSWORD")
 smtp_server = os.getenv("SMTP_SERVER")
 domain = os.getenv("DOMAIN")
 
 
-def send_email(destination, subject, html_content, text_content):
+def send_email(
+    destination: str, subject: str, html_content: str, text_content: str
+) -> None:
+    """
+    Sends an email using the SMTP protocol
+
+        Parameters:
+            destination (str): The destination email address to send to
+            subject (str): The subject of the email
+            html_content (str): The content of the email in HTML format
+            text_content (str): The content of the email in plain text
+    """
     message = MIMEMultipart(
         "alternative"
     )  # This means HTML will be shown first, and if this fails then text (provides an alternative option)
@@ -38,10 +50,18 @@ def send_email(destination, subject, html_content, text_content):
         server.sendmail(email, destination, message.as_string())
 
 
-def verification_email(user_email, user_id):
+def verification_email(user_email: str, user_id: str):
+    """
+    Sends an email-address verification email using the SMTP protocol
+
+        Parameters:
+            user_email (str): The user's email address
+            user_id (str): The user's ID
+    """
     verification_link = (
         f"https://{domain}/api/user/{user_id}/verify-email?email={user_email}"
     )
+    # Uses a template that is filled in dynamically
     html = f"""
 <html>
     <body>
@@ -54,7 +74,9 @@ def verification_email(user_email, user_id):
     </body>
 </html>
     """
+    # Alternative text version
     text = f"""Please verify your email by pressing on this link
     {verification_link}
     """
+    # Send the email
     send_email(user_email, "BoltPass User Verification", html, text)

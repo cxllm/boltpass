@@ -17,83 +17,87 @@ function Login(props: {
 	const [totp, setTotp] = useState(false);
 	const [totpCode, setTotpCode] = useState("");
 	const [recoveryCode, setRecoveryCode] = useState("");
+	const [requestSent, setRequestSent] = useState(false);
 	const navigate = useNavigate();
 	const login = () => {
 		setError("Please wait...");
-		fetch(`/api/login?email=${email}&password=${password}`)
-			.then((r) => r.json())
-			.then((r) => {
-				if (r.error) {
-					// Display relevant error message
-					switch (r.error) {
-						case "EMAIL_NOT_REGISTERED":
-						case "PASSWORD_NOT_CORRECT":
-							setError("The email and password combination is incorrect!");
-							break;
-						case "USER_EMAIL_NOT_VERIFIED":
-							navigate("/verify-email");
-							break;
-						default:
-							setError("Internal Server Error");
-							break;
+		if (!requestSent) {
+			setRequestSent(true);
+			fetch(`/api/login?email=${email}&password=${password}`)
+				.then((r) => r.json())
+				.then((r) => {
+					if (r.error) {
+						// Display relevant error message
+						switch (r.error) {
+							case "EMAIL_NOT_REGISTERED":
+							case "PASSWORD_NOT_CORRECT":
+								setError("The email and password combination is incorrect!");
+								break;
+							case "USER_EMAIL_NOT_VERIFIED":
+								navigate("/verify-email");
+								break;
+							default:
+								setError("Internal Server Error");
+								break;
+						}
 					}
-				}
-				// Check if it is a valid combination
-				else if (r.key && r.user_id) {
-					setError("");
-					// Check if the user has 2FA enabled, and if they do, require it to be completed
-					if (r.tfa_enabled && !totp && !recoveryCode) {
-						setTotp(true);
-					}
-					// the function is called again after the user enters their totp details, so in this case, log them in if the code matches
-					else if (totp && totpCode) {
-						// display the relevant error message
-						if (totpCode.length != 6) {
-							setError("Invalid TOTP code entered");
-						} else {
-							fetch(`/api/verify-totp?secret=${r.totp_secret}&code=${totpCode}`)
-								.then((s) => s.json())
+					// Check if it is a valid combination
+					else if (r.key && r.user_id) {
+						setError("");
+						// Check if the user has 2FA enabled, and if they do, require it to be completed
+						if (r.tfa_enabled && !totp && !recoveryCode) {
+							setTotp(true);
+						}
+						// the function is called again after the user enters their totp details, so in this case, log them in if the code matches
+						else if (totp && totpCode) {
+							// display the relevant error message
+							if (totpCode.length != 6) {
+								setError("Invalid TOTP code entered");
+							} else {
+								fetch(`/api/verify-totp?secret=${r.totp_secret}&code=${totpCode}`)
+									.then((s) => s.json())
+									.then((s) => {
+										if (s.error) {
+											setError("Internal Server Error");
+										} else setError("");
+										// if the code is valid, log the user in
+										if (s == true) {
+											props.login(r.user_id, r.key);
+										} else {
+											// if the code is invalid, show an error
+											setError("Invalid TOTP code entered!");
+										}
+									});
+							}
+						} else if (totp && recoveryCode) {
+							fetch(
+								`/api/user/${r.user_id}/verify-recovery-code?password=${password}&recovery_code=${recoveryCode}`
+							)
+								.then((r) => r.json())
 								.then((s) => {
 									if (s.error) {
-										setError("Internal Server Error");
+										switch (s.error) {
+											case "PASSWORD_NOT_CORRECT":
+												setError("Incorrect password entered!");
+												break;
+											default:
+												setError("Internal Server Error");
+										}
 									} else setError("");
-									// if the code is valid, log the user in
+
 									if (s == true) {
 										props.login(r.user_id, r.key);
 									} else {
-										// if the code is invalid, show an error
-										setError("Invalid TOTP code entered!");
+										setError("Invalid recovery code entered!");
 									}
 								});
+						} else {
+							// if no 2FA, just log the user in
+							props.login(r.user_id, r.key);
 						}
-					} else if (totp && recoveryCode) {
-						fetch(
-							`/api/user/${r.user_id}/verify-recovery-code?password=${password}&recovery_code=${recoveryCode}`
-						)
-							.then((r) => r.json())
-							.then((s) => {
-								if (s.error) {
-									switch (s.error) {
-										case "PASSWORD_NOT_CORRECT":
-											setError("Incorrect password entered!");
-											break;
-										default:
-											setError("Internal Server Error");
-									}
-								} else setError("");
-
-								if (s == true) {
-									props.login(r.user_id, r.key);
-								} else {
-									setError("Invalid recovery code entered!");
-								}
-							});
-					} else {
-						// if no 2FA, just log the user in
-						props.login(r.user_id, r.key);
 					}
-				}
-			});
+				});
+		}
 	};
 	return (
 		<>
@@ -167,7 +171,9 @@ function Login(props: {
 			</form>
 			{error ? <span className="red">{error}</span> : ""}
 			<button
-				onClick={login}
+				onClick={() => {
+					login();
+				}}
 				disabled={
 					// only allow the user to login if email is valid and password exists, and if totp has been entered (where relevant)
 					!emailRegex.test(email) ||

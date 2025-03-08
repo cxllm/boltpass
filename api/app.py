@@ -20,6 +20,7 @@ from routes.user_info import user_info
 from routes.user_2fa import user_2fa
 from routes.passwords import passwords
 from routes.user_email import user_email
+from routes.folders import folders
 
 # gets default values from the password generator function
 default_length, default_uppercase, default_numbers, default_specialchars = (
@@ -45,6 +46,7 @@ app.register_blueprint(user_info)
 app.register_blueprint(user_2fa)
 app.register_blueprint(passwords)
 app.register_blueprint(user_email)
+app.register_blueprint(folders)
 
 
 @app.get("/")

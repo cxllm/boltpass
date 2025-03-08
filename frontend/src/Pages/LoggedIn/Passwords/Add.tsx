@@ -15,29 +15,33 @@ function AddPassword(props: {
 	const [totpSecret, setTotpSecret] = useState("");
 	const [folder, setFolder] = useState("");
 	const [error, setError] = useState("");
+	const [requestSent, setRequestSent] = useState(false);
 	const navigate = useNavigate();
 	const addPassword = () => {
 		setError("Please wait");
-		fetch(`/api/user/${props.user.user_id}/password?key=${props.getKey()}`, {
-			method: "POST",
-			body: JSON.stringify({
-				password,
-				username,
-				name,
-				website,
-				totp_secret: totpSecret,
-				folder_name: folder
+		if (!requestSent) {
+			setRequestSent(true);
+			fetch(`/api/user/${props.user.user_id}/password?key=${props.getKey()}`, {
+				method: "POST",
+				body: JSON.stringify({
+					password,
+					username,
+					name,
+					website,
+					totp_secret: totpSecret,
+					folder_name: folder
+				})
 			})
-		})
-			.then((r) => r.json())
-			.then((r) => {
-				if (r.error) {
-					console.log(r.error);
-					setError("Internal server error");
-				} else {
-					return navigate(`/user/passwords/${r.password_id}`);
-				}
-			});
+				.then((r) => r.json())
+				.then((r) => {
+					if (r.error) {
+						console.log(r.error);
+						setError("Internal server error");
+					} else {
+						return navigate(`/user/passwords/${r.password_id}`);
+					}
+				});
+		}
 	};
 	return (
 		<>
@@ -97,7 +101,12 @@ function AddPassword(props: {
 					onInput={(v) => setTotpSecret(v.currentTarget.value)}
 				/>
 			</form>
-			<button onClick={addPassword} disabled={!password || !username || !name}>
+			<button
+				onClick={() => {
+					addPassword();
+				}}
+				disabled={!password || !username || !name}
+			>
 				Add Password
 			</button>
 			{error ? <span className="red">{error}</span> : ""}

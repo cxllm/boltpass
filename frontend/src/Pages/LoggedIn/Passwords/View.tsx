@@ -237,7 +237,7 @@ function ViewPassword(props: {
 								? "Are you sure? Press again to confirm"
 								: deletePressed == 0
 								? "Delete this password"
-								: "Deleting your account..."}
+								: "Deleting password..."}
 						</button>
 						<br />
 					</div>

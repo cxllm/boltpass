@@ -18,6 +18,7 @@ function Passwords(props: { dark: boolean; user: User; getKey: () => void }) {
 	const { folderName } = useParams();
 	const [passwords, setPasswords] = useState<Password[]>();
 	const [searchQuery, setSearchQuery] = useState("");
+	const [requestSent, setRequestSent] = useState(false);
 	const navigate = useNavigate();
 	const getPasswords = () => {
 		fetch(`/api/user/${props.user.user_id}/passwords?key=${props.getKey()}`)
@@ -26,16 +27,28 @@ function Passwords(props: { dark: boolean; user: User; getKey: () => void }) {
 				if (r.error) {
 					return;
 				} else {
-					console.log(r);
 					setPasswords(r);
 				}
 			});
 	};
 	const deleteFolder = () => {
-		fetch(
-			`/api/user/${props.user.user_id}/folder/${folderName}?key=${props.getKey()}`,
-			{ method: "DELETE" }
-		).then(() => {});
+		if (!requestSent) {
+			setRequestSent(true);
+			fetch(
+				`/api/user/${
+					props.user.user_id
+				}/folder/${folderName}?key=${props.getKey()}`,
+				{ method: "DELETE" }
+			)
+				.then((r) => r.json())
+				.then((r) => {
+					if (r.error) {
+						return;
+					} else if (r.success) {
+						return navigate("/user/passwords");
+					}
+				});
+		}
 	};
 	if (!passwords) getPasswords();
 	const filteredResults = passwords?.filter((p) => {
@@ -70,8 +83,13 @@ function Passwords(props: { dark: boolean; user: User; getKey: () => void }) {
 					Add Password
 				</button>
 				{folderName ? (
-					<button className="red-button" onClick={() => deleteFolder()}>
-						Delete Folder
+					<button
+						className="red-button"
+						onClick={() => {
+							deleteFolder();
+						}}
+					>
+						{requestSent ? "Deleting" : "Delete Folder"}
 					</button>
 				) : (
 					""
