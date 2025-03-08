@@ -10,6 +10,7 @@ function UpdateEmail(props: { dark: boolean; user: User; logout: () => void }) {
 	const [password, setPassword] = useState("");
 	const [error, setError] = useState("");
 	const [success, setSuccess] = useState(false);
+	const [loggedOut, setLoggedOut] = useState(false);
 	const updateEmail = () => {
 		setError("Please wait...");
 		fetch(`/api/user/${props.user.user_id}/update-email?password=${password}`, {
@@ -36,7 +37,7 @@ function UpdateEmail(props: { dark: boolean; user: User; logout: () => void }) {
 					setError("");
 					setSuccess(true);
 					setTimeout(() => {
-						props.logout();
+						if (!loggedOut) props.logout();
 					}, 15000);
 				}
 			});
@@ -54,7 +55,16 @@ function UpdateEmail(props: { dark: boolean; user: User; logout: () => void }) {
 						login page.
 					</h2>
 					<p>
-						Click <a onClick={props.logout}>here</a> to logout now
+						Click{" "}
+						<a
+							onClick={() => {
+								setLoggedOut(true);
+								props.logout();
+							}}
+						>
+							here
+						</a>{" "}
+						to logout now
 					</p>
 				</>
 			) : (
@@ -70,7 +80,11 @@ function UpdateEmail(props: { dark: boolean; user: User; logout: () => void }) {
 						{
 							// only display if anything has been entered
 							email ? (
-								// check if email is valid and display an error message if not
+								email == props.user.email ? (
+									<span className="red">
+										Your new email can't be the same as your old one!
+									</span>
+								) : // check if email is valid and display an error message if not
 								emailRegex.test(email) ? (
 									<span className="green">Email is valid!</span>
 								) : (
@@ -112,7 +126,9 @@ function UpdateEmail(props: { dark: boolean; user: User; logout: () => void }) {
 						onClick={updateEmail}
 						disabled={
 							// only allow the user to sign up if the emails match, are valid and a password has been entered
-							!(emailRegex.test(email) && email === emailVerification) || !password
+							!(emailRegex.test(email) && email === emailVerification) ||
+							!password ||
+							email == props.user.email
 						}
 					>
 						Change Email Address

@@ -164,7 +164,16 @@ function ViewPassword(props: {
 						<div className="left">
 							<h2>Details</h2>
 							<p>Name: {passwordInfo.name}</p>
-							<p>Folder: {passwordInfo.folder_name || "None"}</p>
+							<p>
+								Folder:{" "}
+								{passwordInfo.folder_name ? (
+									<Link to={`/user/passwords/folder/${passwordInfo.folder_name}`}>
+										{passwordInfo.folder_name}
+									</Link>
+								) : (
+									"None"
+								)}
+							</p>
 							<p>Website: {passwordInfo.website || "None"}</p>
 						</div>
 						<div className="right">

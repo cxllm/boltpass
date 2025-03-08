@@ -316,3 +316,36 @@ def verify_user_email_route(user_id):
     if not user.email_verified:
         user.verify_email()
     return redirect("/email-verified")
+
+
+@user_management.put("/api/user/<user_id>/password")
+def update_user_password_route(user_id):
+    data = json.loads(request.data)
+    if not user_id or "old" not in data.keys() or "new" not in data.keys():
+        return jsonify(
+            {
+                "error": "MISSING_DATA",
+                "text": "User ID, old password and new password must be included in the request",
+            }
+        )
+    try:
+        user = User(user_id=user_id)
+        old = data["old"]
+        new = data["new"]
+        if not user.verify_password(old):
+            return jsonify(
+                {
+                    "error": "PASSWORD_NOT_CORRECT",
+                    "text": "The password entered is invalid",
+                }
+            )
+        user.update_password(old, new)
+        return jsonify({"success": True})
+
+    except InvalidUserIDError:
+        return jsonify(
+            {
+                "error": "USER_ID_DOES_NOT_EXIST",
+                "text": "The user ID entered is not valid",
+            }
+        )

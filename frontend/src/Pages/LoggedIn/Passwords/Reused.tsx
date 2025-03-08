@@ -15,7 +15,9 @@ function ReusedPasswords(props: {
 	const [filteredPasswords, setFilteredPasswords] = useState<Password[]>();
 
 	const getPasswords = () => {
-		fetch(`/api/user/${props.user.user_id}/passwords?key=${props.getKey()}`)
+		fetch(
+			`/api/user/${props.user.user_id}/passwords/security?key=${props.getKey()}`
+		)
 			.then((r) => r.json())
 			.then((r) => {
 				if (r.error) {

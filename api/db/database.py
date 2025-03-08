@@ -11,8 +11,19 @@ def connect():
             cursor: The cursor for the database
     """
     load_dotenv()
-    connection_string = os.getenv("CONNECTION_STRING")
-    with psycopg2.connect(connection_string) as conn:
+    host = os.getenv("HOST")
+    port = os.getenv("PORT")
+    user = os.getenv("USER")
+    dbname = os.getenv("DB")
+    password = os.getenv("PASSWORD")
+
+    with psycopg2.connect(
+        host=host,
+        port=port,
+        dbname=dbname,
+        user=user,
+        password=password,
+    ) as conn:
         return conn, conn.cursor()
 
 
@@ -62,7 +73,7 @@ def create_tables(cursor):
         name TEXT NOT NULL,
         folder_name TEXT,
         TOTP_secret TEXT,
-        website TEXT
+        website TEXT,
         FOREIGN KEY(user_id, folder_name) REFERENCES folders(user_id, folder_name),
         FOREIGN KEY(user_id) REFERENCES users(user_id)
     )""",

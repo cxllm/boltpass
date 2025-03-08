@@ -115,6 +115,25 @@ class User:
         """
         return derive_key(password, self.salt)[1]
 
+    def update_password(self, old, new):
+        conn, cursor = connect()
+        key = self.derive_key(old)
+        hashed, salt = generate_hash(new)
+        cursor.execute(
+            """UPDATE users 
+            SET password_hash = %s, password_salt = %s
+            WHERE user_id = %s""",
+            (hashed, salt, self.user_id),
+        )
+        conn.commit()
+        conn.close()
+        self.password_hash = hashed
+        self.salt = salt
+        new_key = self.derive_key(new)
+        for p in self.get_passwords():
+            decrypted = p.decrypt(key)
+            p.update_password(decrypted, new_key)
+
     def send_verification_email(self, url):
         """
         Sends an email to the user to verify their email
@@ -380,17 +399,12 @@ def delete_user(user_id):
         (user_id,),
     )
     cursor.execute(
-        """DELETE FROM folders
-            WHERE user_id = %s""",
-        (user_id,),
-    )
-    cursor.execute(
         """DELETE FROM passwords
             WHERE user_id = %s""",
         (user_id,),
     )
     cursor.execute(
-        """DELETE FROM secure_notes
+        """DELETE FROM folders
             WHERE user_id = %s""",
         (user_id,),
     )

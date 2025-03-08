@@ -35,7 +35,7 @@ function Passwords(props: { dark: boolean; user: User; getKey: () => void }) {
 		fetch(
 			`/api/user/${props.user.user_id}/folder/${folderName}?key=${props.getKey()}`,
 			{ method: "DELETE" }
-		);
+		).then(() => {});
 	};
 	if (!passwords) getPasswords();
 	const filteredResults = passwords?.filter((p) => {
