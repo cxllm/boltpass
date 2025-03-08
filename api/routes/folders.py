@@ -12,7 +12,7 @@ from db.user import (
 )
 from db.folder import Folder, FolderDoesNotExistError
 
-folders = Blueprint("user_info", __name__)
+folders = Blueprint("folders", __name__)
 
 
 @folders.get("/api/user/<user_id>/folders")
@@ -35,9 +35,9 @@ def user_folders_route(user_id):
 
 
 @folders.delete("/api/user/<user_id>/folders/<folder_name>")
-def user_folders_route(user_id, folder_name):
+def user_folder_delete_route(user_id, folder_name):
     try:
-        user = User(user_id=user_id)
+        _ = User(user_id=user_id)
         folder = Folder(user_id, folder_name)
         folder.delete()
         return jsonify({"success": True})

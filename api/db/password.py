@@ -233,12 +233,22 @@ class Password:
         return self.website, self.name, self.totp_secret, self.username
 
     def delete(self):
-        conn, cursor = connect()
+        """
+        Delete a password
 
+            Parameters:
+                self: The specific instance of the class
+
+            Returns
+                out (bool): If the deletion was successful
+        """
+        conn, cursor = connect()
+        # Delete the password from the database
         cursor.execute(
             """DELETE FROM passwords WHERE password_id = %s AND user_id = %s""",
             (self.password_id, self.user_id),
         )
+        # Check if the folder the password was in is now empty
         if self.folder_name:
             cursor.execute(
                 """SELECT * FROM passwords WHERE folder_name = %s AND user_id = %s""",
@@ -250,6 +260,7 @@ class Password:
                     """DELETE FROM folders WHERE folder_name = %s AND user_id = %s""",
                     (self.folder_name, self.user_id),
                 )
+        # Check if the deletion was successful
         cursor.execute(
             """SELECT * FROM passwords WHERE password_id = %s AND user_id = %s""",
             (self.password_id, self.user_id),
