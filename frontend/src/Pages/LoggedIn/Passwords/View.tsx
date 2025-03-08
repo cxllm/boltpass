@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { User } from "../../../App";
 import Logo from "../../../Components/Logo";
 import { useParams, useNavigate, Link } from "react-router";
@@ -81,21 +81,31 @@ function ViewPassword(props: {
 		navigator.clipboard.writeText(value);
 	};
 	if (!passwordInfo) getPassword();
-	if (passwordInfo?.totp_secret && !tfaCode) {
-		get2FACode(); // generate code on loading the website
+	// generate code on loading the website
+	if (passwordInfo?.totp_secret && !tfaCode) get2FACode();
+	// deactivates the intervals when the user leaves the page
+	useEffect(() => {
 		// The interval used in the timeout means that the code is refreshed whenever the next minute passes or the next 30 seconds past the minute passes
-		setTimeout(() => {
+		let interval1: number;
+		const timer: number = setTimeout(() => {
 			get2FACode();
 			// set the interval after the timeout to be every 30 seconds, so on the minute and on 30 seconds past the minute
-			setInterval(() => {
+			interval1 = setInterval(() => {
 				get2FACode();
 			}, 30000);
 		}, getCodeValidTime() * 1000);
 
-		setInterval(() => {
+		const interval2: number = setInterval(() => {
 			setTimeLeftOnCode(getCodeValidTime());
 		}, 1000);
-	}
+		return () => {
+			// clear the intevarls when the user leaves
+			clearTimeout(timer);
+			clearInterval(interval1);
+			clearInterval(interval2);
+		};
+	});
+
 	return (
 		<>
 			<Logo dark={props.dark} />
@@ -104,7 +114,7 @@ function ViewPassword(props: {
 			{passwordInfo ? (
 				<>
 					<div className="grid">
-						<div className="left">
+						<div className="full-length">
 							<h2>Login Credentials</h2>
 							<p>
 								Username: <span>{passwordInfo.username}</span>{" "}
@@ -126,15 +136,9 @@ function ViewPassword(props: {
 									}}
 								>
 									{copiedPass ? <FaCheck /> : <FaCopy />}
-								</a>
+								</a>{" "}
+								<a onClick={() => setShow(!show)}>{show ? "Hide" : "Show"}</a>
 							</p>
-							<button onClick={() => setShow(!show)}>{show ? "Hide" : "Show"}</button>
-						</div>
-						<div className="right">
-							<h2>Details</h2>
-							<p>Name: {passwordInfo.name}</p>
-							<p>Folder: {passwordInfo.folder_name || "None"}</p>
-							<p>Website: {passwordInfo.website || "None"}</p>
 							<p>
 								2FA Code:{" "}
 								{tfaCode ? (
@@ -157,24 +161,62 @@ function ViewPassword(props: {
 								)}
 							</p>
 						</div>
+						<div className="left">
+							<h2>Details</h2>
+							<p>Name: {passwordInfo.name}</p>
+							<p>Folder: {passwordInfo.folder_name || "None"}</p>
+							<p>Website: {passwordInfo.website || "None"}</p>
+						</div>
+						<div className="right">
+							<h2>Security</h2>
+							<p>
+								{passwordInfo.leaked > 0 || passwordInfo.reused > 1 ? (
+									<span className="red">
+										You should change your password! See below for details
+									</span>
+								) : (
+									<span className="green">
+										Your password is secure! See below for details
+									</span>
+								)}
+							</p>
+							<p>
+								This password has been leaked{" "}
+								{passwordInfo.leaked == 0 ? (
+									<span className="green">0 times</span>
+								) : (
+									<span className="red">
+										{passwordInfo.leaked} time{passwordInfo.leaked == 1 ? "" : "s"}
+									</span>
+								)}
+							</p>
+							<p>
+								You have reused this password{" "}
+								{passwordInfo.reused == 0 ? (
+									<span className="green">0 times</span>
+								) : (
+									<span className="red">
+										{passwordInfo.reused} time{passwordInfo.reused == 1 ? "" : "s"}
+									</span>
+								)}{" "}
+							</p>
+							{passwordInfo.reused > 0 ? (
+								<p>
+									To see which other entries use this password, click{" "}
+									<Link to={`/user/passwords/${passwordID}/reused`}>here</Link>
+								</p>
+							) : (
+								""
+							)}
+						</div>
 					</div>
-					<div
-						style={{
-							display: "flex",
-							width: "fit-content",
-							marginLeft: "auto",
-							marginRight: "auto"
-						}}
-					>
-						<button
-							style={{ margin: "0.2rem" }}
-							onClick={() => navigate(`/user/passwords/${passwordID}/edit`)}
-						>
+					<div className="buttons">
+						<button onClick={() => navigate(`/user/passwords/${passwordID}/edit`)}>
 							Edit Password
 						</button>
 
 						<button
-							style={{ backgroundColor: "red", margin: "0.2rem" }}
+							className="red-button"
 							onClick={() => {
 								if (deletePressed == 1) {
 									deletePassword();

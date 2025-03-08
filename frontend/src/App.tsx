@@ -22,6 +22,8 @@ import About from "./Pages/About";
 import AddPassword from "./Pages/LoggedIn/Passwords/Add";
 import ViewPassword from "./Pages/LoggedIn/Passwords/View";
 import EditPassword from "./Pages/LoggedIn/Passwords/Edit";
+import Folders from "./Pages/LoggedIn/Folders";
+import ReusedPasswords from "./Pages/LoggedIn/Passwords/Reused";
 
 export interface User {
 	user_id?: string;
@@ -172,7 +174,27 @@ function App() {
 								element={loggedIn ? <Navigate to="/" /> : <EmailVerifed dark={dark} />}
 							/>
 							<Route
+								path="/user/folders"
+								element={
+									loggedIn && user ? (
+										<Folders dark={dark} user={user} />
+									) : (
+										<Navigate to="/login" />
+									)
+								}
+							/>
+							<Route
 								path="/user/passwords"
+								element={
+									loggedIn && user ? (
+										<Passwords dark={dark} user={user} getKey={getKey} />
+									) : (
+										<Navigate to="/login" />
+									)
+								}
+							/>
+							<Route
+								path="/user/passwords/folder/:folderName"
 								element={
 									loggedIn && user ? (
 										<Passwords dark={dark} user={user} getKey={getKey} />
@@ -196,6 +218,16 @@ function App() {
 								element={
 									loggedIn && user ? (
 										<ViewPassword dark={dark} user={user} getKey={getKey} />
+									) : (
+										<Navigate to="/login" />
+									)
+								}
+							/>
+							<Route
+								path="/user/passwords/:passwordID/reused"
+								element={
+									loggedIn && user ? (
+										<ReusedPasswords dark={dark} user={user} getKey={getKey} />
 									) : (
 										<Navigate to="/login" />
 									)

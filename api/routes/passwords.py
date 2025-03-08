@@ -25,6 +25,7 @@ def user_passwords_route(user_id):
         )
     try:
         user = User(user_id=user_id)
+        security = user.check_security(key)
         passwords = user.get_passwords()
         p = []
         for password in passwords:
@@ -38,6 +39,8 @@ def user_passwords_route(user_id):
                     "website": password.website,
                     "username": password.username,
                     "totp_secret": password.totp_secret,
+                    "reused": security[decrypted]["reused"],
+                    "leaked": security[decrypted]["leaked"],
                 }
             )
         # Sort password by their name
@@ -61,7 +64,8 @@ def user_password_route(user_id, password_id):
             {"error": "NO_KEY_ENTERED", "text": "No encryption key was provided."}
         )
     try:
-        _ = User(user_id=user_id)
+        user = User(user_id=user_id)
+        security = user.check_security(key)
         password = Password(user_id=user_id, password_id=password_id)
         decrypted = password.decrypt(key=key)
         return jsonify(
@@ -73,6 +77,8 @@ def user_password_route(user_id, password_id):
                 "website": password.website,
                 "username": password.username,
                 "totp_secret": password.totp_secret,
+                "reused": security[decrypted]["reused"],
+                "leaked": security[decrypted]["leaked"],
             }
         )
     except InvalidUserIDError:
@@ -107,7 +113,7 @@ def add_password_route(user_id):
         return jsonify(
             {
                 "error": "MISSING_DATA",
-                "text": "Both username, password, encryption key, user id and name need to be included in the post request",
+                "text": "Username, password, encryption key, user id and name need to be included in the post request",
             }
         )
     password = data["password"]
@@ -169,4 +175,81 @@ def delete_password_route(user_id, password_id):
 
 @passwords.put("/api/user/<user_id>/password/<password_id>")
 def edit_password_route(user_id, password_id):
-    pass
+    key = request.args.get("key")
+    data = json.loads(request.data)
+    keys = data.keys()
+    if (
+        not user_id
+        or not password_id
+        or not key
+        or not "decrypted" in keys
+        or not "username" in keys
+        or not "name" in keys
+    ):
+        return jsonify(
+            {
+                "error": "MISSING_DATA",
+                "text": "Username, password, encryption key, user id, password id and name need to be included in the post request",
+            }
+        )
+    try:
+        _ = User(user_id=user_id)
+        password = Password(user_id, password_id)
+        old = password.decrypt(key)
+        new = data["decrypted"]
+        username = data["username"]
+        name = data["name"]
+        website = data["website"] if data["website"] else None
+        totp_secret = data["totp_secret"] if data["totp_secret"] else None
+        folder_name = data["folder_name"].capitalize() if data["folder_name"] else None
+        if old != new:
+            password.update_password(new, key)
+        password.update_information(website, name, totp_secret, username)
+        if folder_name != password.folder_name:
+            password.change_folder(folder_name)
+        return jsonify(
+            {
+                "decrypted": password.decrypt(key),
+                "password_id": password.password_id,
+                "name": password.name,
+                "folder_name": password.folder_name,
+                "website": password.website,
+                "username": password.username,
+                "totp_secret": password.totp_secret,
+            }
+        )
+    except InvalidUserIDError:
+        return jsonify(
+            {"error": "USER_ID_INVALID", "text": "This user ID was not recognised."}
+        )
+    except InvalidPasswordIDError:
+        return jsonify(
+            {
+                "error": "PASSWORD_ID_INVALID",
+                "text": "This password ID was not recognised.",
+            }
+        )
+    except:
+        return jsonify(
+            {"error": "INVALID_KEY_ENTERED", "text": "The key entered is incorrect"}
+        )
+
+
+@passwords.get("/api/user/<user_id>/passwords/security")
+def password_security_route(user_id):
+    key = request.args.get("key")
+    if not key:
+        return jsonify(
+            {"error": "NO_KEY_ENTERED", "text": "No encryption key was provided."}
+        )
+    try:
+        user = User(user_id=user_id)
+        return user.check_security(key)
+    except InvalidUserIDError:
+        return jsonify(
+            {"error": "USER_ID_INVALID", "text": "This user ID was not recognised."}
+        )
+    except:
+        return jsonify(
+            {"error": "INVALID_KEY_ENTERED", "text": "The key entered is incorrect"}
+        )

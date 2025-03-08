@@ -75,13 +75,6 @@ export default class NavigationLoggedIn extends Component<
 								Passwords
 							</Nav.Link>
 							<Nav.Link
-								eventKey="/user/secure-notes"
-								as={Link}
-								to="/user/secure-notes"
-							>
-								Secure Notes
-							</Nav.Link>
-							<Nav.Link
 								eventKey="/password-generator"
 								as={Link}
 								to="/password-generator"

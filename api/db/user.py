@@ -3,12 +3,13 @@ import sys
 import uuid
 import re
 
-path = os.path.dirname(os.path.realpath(__file__ + "/.."))
+path = os.path.dirname(os.path.realpath(__file__))
 sys.path.insert(1, path)
 from util.password_hashing import verify_password, generate_hash
 from util.encryption import derive_key, encrypt
 from util.smtp import verification_email
-from db.folder import create_folder
+from util.security import check_instances_of_password, check_password_leaked
+from folder import create_folder, Folder
 
 path = os.path.dirname(os.path.realpath(__file__))
 sys.path.insert(1, path)
@@ -89,6 +90,7 @@ class User:
         self.folders = []
         self.get_passwords()
         self.get_recovery_codes()
+        self.get_folders()
 
     # method to check if the password is correct
     def verify_password(self, password):
@@ -228,6 +230,24 @@ class User:
         self.passwords = passwords
         return passwords
 
+    def check_security(self, key):
+        self.get_passwords()
+        counts = self.check_passwords_repeated(key)
+        passwords = {}
+        for password in self.passwords:
+            decrypted = password.decrypt(key)
+            passwords[decrypted] = {}
+            if decrypted in counts.keys():
+                passwords[decrypted]["reused"] = counts[decrypted]
+            passwords[decrypted]["leaked"] = check_password_leaked(decrypted)
+        return passwords
+
+    def check_passwords_repeated(self, key):
+        self.get_passwords()
+        passwords = [p.decrypt(key) for p in self.passwords]
+        counts = check_instances_of_password(passwords)
+        return counts
+
     def get_recovery_codes(self):
         conn, cursor = connect()
         cursor.execute(
@@ -241,6 +261,17 @@ class User:
         ]
         self.recovery_codes = codes
         return codes
+
+    def get_folders(self):
+        conn, cursor = connect()
+        cursor.execute(
+            "SELECT folder_name FROM folders WHERE user_id = %s", (self.user_id,)
+        )
+        folders = cursor.fetchall()
+        folders = [Folder(self.user_id, f[0]) for f in folders]
+        conn.close()
+        self.folders = folders
+        return folders
 
     def disable_tfa(self):
         self.tfa_enabled = False

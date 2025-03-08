@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { User } from "../../../App";
-import { useNavigate, Link } from "react-router";
+import { useNavigate, Link, useParams } from "react-router";
 import Logo from "../../../Components/Logo";
 
 export interface Password {
@@ -11,8 +11,11 @@ export interface Password {
 	website: string | undefined | null;
 	username: string;
 	totp_secret: string | undefined | null;
+	reused: number;
+	leaked: number;
 }
 function Passwords(props: { dark: boolean; user: User; getKey: () => void }) {
+	const { folderName } = useParams();
 	const [passwords, setPasswords] = useState<Password[]>();
 	const [searchQuery, setSearchQuery] = useState("");
 	const navigate = useNavigate();
@@ -23,16 +26,34 @@ function Passwords(props: { dark: boolean; user: User; getKey: () => void }) {
 				if (r.error) {
 					return;
 				} else {
+					console.log(r);
 					setPasswords(r);
 				}
 			});
 	};
+	const deleteFolder = () => {
+		fetch(
+			`/api/user/${props.user.user_id}/folder/${folderName}?key=${props.getKey()}`,
+			{ method: "DELETE" }
+		);
+	};
 	if (!passwords) getPasswords();
 	const filteredResults = passwords?.filter((p) => {
-		if (!searchQuery) {
+		if (!searchQuery && !folderName) {
 			return true;
+		} else if (folderName) {
+			return p.folder_name == folderName;
 		}
+
 		const s = searchQuery.toLowerCase();
+		if (folderName) {
+			return (
+				p.folder_name == folderName &&
+				(p.name.toLowerCase().includes(s) ||
+					p.website?.toLowerCase().includes(s) ||
+					p.username.toLowerCase().includes(s))
+			);
+		}
 		return (
 			p.name.toLowerCase().includes(s) ||
 			p.folder_name?.toLowerCase().includes(s) ||
@@ -43,8 +64,19 @@ function Passwords(props: { dark: boolean; user: User; getKey: () => void }) {
 	return (
 		<>
 			<Logo dark={props.dark} />
-			<h1>Your Passwords</h1>
-			<button onClick={() => navigate("/user/passwords/add")}>Add Password</button>
+			<h1>Your Passwords{folderName ? ` - ${folderName}` : ""}</h1>
+			<div className="buttons">
+				<button onClick={() => navigate("/user/passwords/add")}>
+					Add Password
+				</button>
+				{folderName ? (
+					<button className="red-button" onClick={() => deleteFolder()}>
+						Delete Folder
+					</button>
+				) : (
+					""
+				)}
+			</div>
 			{passwords ? (
 				<>
 					<input
@@ -59,20 +91,24 @@ function Passwords(props: { dark: boolean; user: User; getKey: () => void }) {
 					{filteredResults && filteredResults.length >= 1 ? (
 						<div className="grid">
 							{filteredResults.map((p: Password, i) => (
-								<div className={i % 2 == 1 ? "right" : "left"}>
-									<h2>{p.name}</h2>
-									<p>
-										Username: {p.username}
-										<br />
-										Website: {p.website || "None"}
-									</p>
+								<Link to={`/user/passwords/${p.password_id}`}>
+									<div className={i % 2 == 1 ? "right" : "left"}>
+										<h2>{p.name}</h2>
+										<p>
+											Username: {p.username}
+											<br />
+											Website: {p.website || "None"}
+										</p>
 
-									<Link to={`/user/passwords/${p.password_id}`}>View</Link>
-								</div>
+										<Link to={`/user/passwords/${p.password_id}`}>View</Link>
+									</div>
+								</Link>
 							))}{" "}
 						</div>
 					) : (
-						<span className="red">No results found!</span>
+						<span className="red">
+							{folderName ? "Folder does not exist!" : "No results found!"}
+						</span>
 					)}
 				</>
 			) : (

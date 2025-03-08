@@ -69,6 +69,10 @@ body {
 			color: #fff8;
 			cursor: not-allowed;
 		}
+
+		button.red-button {
+			background-color: red;
+		}
 	}
 
 	.nav {
@@ -158,7 +162,15 @@ body {
 		// fixes margins on the password generator page
 		margin: 0.5rem;
 	}
-
+	div.buttons {
+		display: flex;
+		width: fit-content;
+		margin-left: auto;
+		margin-right: auto;
+		button {
+			margin: 0.2rem;
+		}
+	}
 	div.grid {
 		display: grid;
 		color: white;
@@ -168,6 +180,7 @@ body {
 			margin-bottom: 0.25rem;
 		}
 		div {
+			color: white !important;
 			margin: 0.25rem;
 			padding: 0.625rem;
 			border-radius: 0.625rem;
@@ -175,6 +188,9 @@ body {
 			input {
 				width: 100%;
 			}
+		}
+		div.full-length {
+			grid-column: 1 / -1;
 		}
 		div.right {
 			margin-right: 0;

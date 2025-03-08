@@ -33,3 +33,22 @@ def user_info_route(user_id):
         return jsonify(
             {"error": "USER_ID_INVALID", "text": "This user ID was not recognised."}
         )
+
+
+@user_info.get("/api/user/<user_id>/folders")
+def user_folders_route(user_id):
+    try:
+        user = User(user_id=user_id)
+        folders = [
+            {
+                "user_id": f.user_id,
+                "folder_name": f.folder_name,
+                "items": len(f.get_passwords()),
+            }
+            for f in user.folders
+        ]
+        return jsonify(folders)
+    except InvalidUserIDError:
+        return jsonify(
+            {"error": "USER_ID_INVALID", "text": "This user ID was not recognised."}
+        )

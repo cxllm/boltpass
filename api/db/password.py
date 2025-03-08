@@ -85,9 +85,20 @@ class Password:
         cursor.execute(
             """UPDATE passwords
             SET folder_name=%s
-            WHERE password_id=%s, user_id=%s""",
+            WHERE password_id=%s AND user_id=%s""",
             (folder_name, self.password_id, self.user_id),
         )
+        if self.folder_name:
+            cursor.execute(
+                """SELECT * FROM passwords WHERE user_id=%s AND folder_name=%s""",
+                (self.user_id, self.folder_name),
+            )
+            data = cursor.fetchall()
+            if len(data) == 0:
+                cursor.execute(
+                    "DELETE FROM folders WHERE user_id=%s AND folder_name=%s",
+                    (self.user_id, self.folder_name),
+                )
         self.folder_name = folder_name
         conn.commit()
         conn.close()
@@ -101,6 +112,13 @@ class Password:
             and name is None
             and totp_secret is None
             and username is None
+        ):
+            pass
+        elif (
+            website == self.website
+            and name == self.name
+            and totp_secret == self.totp_secret
+            and username == self.username
         ):
             pass
         else:
