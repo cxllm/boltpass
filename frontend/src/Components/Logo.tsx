@@ -1,3 +1,4 @@
+// Component to avoid having to repeat the logo code each time
 function Logo(props: { dark: boolean }) {
 	return (
 		<img

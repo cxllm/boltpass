@@ -49,7 +49,7 @@ class InvalidUserIDError(Exception):
 
 
 class User:
-    def __init__(self, email_address="", user_id=""):
+    def __init__(self, email_address: str = "", user_id: str = "") -> None:
         """
         Constructor for the User class
             Parameters:
@@ -93,7 +93,7 @@ class User:
         self.get_folders()
 
     # method to check if the password is correct
-    def verify_password(self, password):
+    def verify_password(self, password: str) -> bool:
         """
         Checks if the users password is correct
             Parameters:
@@ -104,43 +104,57 @@ class User:
         """
         return verify_password(password, self.salt, self.password_hash)
 
-    def derive_key(self, password):
+    def derive_key(self, password: str) -> str:
         """
         Derives the user's encryption key
             Parameters:
                 self: Refers to the specific instance of the class
                 password (str): Password to derive from
-            Returns
+            Returns:
                 key (str): The derived key in hex form
         """
         return derive_key(password, self.salt)[1]
 
-    def update_password(self, old, new):
+    def update_password(self, old: str, new: str) -> None:
+        """
+        Update the user's password and all the passwords that have been encrypted
+            Parameters:
+                self: Refers to the specific instance of the class
+                old (str): The old password
+                new (str): The new password to update to
+        """
         conn, cursor = connect()
-        key = self.derive_key(old)
-        hashed, salt = generate_hash(new)
+        key = self.derive_key(old)  # Get the old encryption key
+        hashed, salt = generate_hash(new)  # Get the new hash and salt for the new key
         cursor.execute(
             """UPDATE users 
             SET password_hash = %s, password_salt = %s
             WHERE user_id = %s""",
-            (hashed, salt, self.user_id),
+            (
+                hashed,
+                salt,
+                self.user_id,
+            ),  # Update the user's password hash in the database
         )
         conn.commit()
         conn.close()
+        # Update this in the class
         self.password_hash = hashed
         self.salt = salt
+        # Get the new key
         new_key = self.derive_key(new)
         for p in self.get_passwords():
+            # Update each password individually with the new key
             decrypted = p.decrypt(key)
             p.update_password(decrypted, new_key)
 
-    def send_verification_email(self):
+    def send_verification_email(self) -> None:
         """
         Sends an email to the user to verify their email
         """
         verification_email(self.email, self.user_id)
 
-    def verify_email(self):
+    def verify_email(self) -> None:
         """
         Marks user's email as verified
         """
@@ -155,7 +169,13 @@ class User:
         conn.commit()
         conn.close()
 
-    def update_email(self, email):
+    def update_email(self, email: str) -> None:
+        """
+        Update a user's email in the database and send a verification email to confirm
+            Parameters:
+                self: Refers to the specific instance of the class
+                email (str): The email to update to
+        """
         self.email_verified = False
         self.email = email
         conn, cursor = connect()
@@ -171,14 +191,14 @@ class User:
 
     def add_password(
         self,
-        name,
-        password,
-        key,
-        username,
-        website=None,
-        totp_secret=None,
-        folder_name=None,
-    ):
+        name: str,
+        password: str,
+        key: str,
+        username: str,
+        website: str = None,
+        totp_secret: str = None,
+        folder_name: str = None,
+    ) -> Password:
         """
         Add a password to the database
             Parameters:
@@ -222,10 +242,11 @@ class User:
         conn.commit()
         conn.close()
         password = Password(user_id=self.user_id, password_id=password_id)
+        # Add the new password into the instance of the class
         self.passwords.append(password)
         return password
 
-    def get_passwords(self):
+    def get_passwords(self) -> list[Password]:
         """
         Gets all passwords from the database
             Parameters:
@@ -236,12 +257,14 @@ class User:
 
         """
         conn, cursor = connect()
+        # Get all the passwords IDs from the database
         cursor.execute(
             "SELECT password_id FROM passwords WHERE user_id = %s",
             (self.user_id,),
         )
         password_ids = cursor.fetchall()
         conn.close()
+        # initialise a class for each passwords and put it in this class
         passwords = [
             Password(user_id=self.user_id, password_id=password[0])
             for password in password_ids
@@ -249,25 +272,57 @@ class User:
         self.passwords = passwords
         return passwords
 
-    def check_security(self, key):
+    def check_security(self, key: str) -> dict[str, dict[str, int]]:
+        """
+        Check the security of the passwords by checking if there are repeeated entries or if there are leaked passwords
+
+            Parameters:
+                self: Refers to the specific instance of the class
+                key (str): The encryption key to use to decrypt the passwords
+
+            Returns:
+                security (dict): The security information related to the user's stored passwords, including which passwords have been leaked or reused
+        """
         self.get_passwords()
         counts = self.check_passwords_repeated(key)
         passwords = {}
+        # Get all the passwords and decrypt them
         for password in self.passwords:
             decrypted = password.decrypt(key)
             passwords[decrypted] = {}
+            # get how many times it was reused
             if decrypted in counts.keys():
                 passwords[decrypted]["reused"] = counts[decrypted]
+            # get how many times it was leaked
             passwords[decrypted]["leaked"] = check_password_leaked(decrypted)
         return passwords
 
-    def check_passwords_repeated(self, key):
+    def check_passwords_repeated(self, key: str) -> dict[str, int]:
+        """
+        Check how many times the user has repeated a password
+
+            Parameters:
+                self: Refers to the specific instance of the class
+                key (str): The user's encryption key
+
+            Returns:
+                counts (dict): How many times each password has been used
+        """
         self.get_passwords()
         passwords = [p.decrypt(key) for p in self.passwords]
         counts = check_instances_of_password(passwords)
         return counts
 
-    def get_recovery_codes(self):
+    def get_recovery_codes(self) -> list[RecoveryCode]:
+        """
+        Get the users recovery codes
+
+            Parameters:
+                self: Refers to the specific instance of the class
+
+            Returns:
+                codes (RecoveryCode[]): The list of recovery codes
+        """
         conn, cursor = connect()
         cursor.execute(
             "SELECT code_id FROM recovery_codes WHERE user_id = %s",
@@ -281,7 +336,16 @@ class User:
         self.recovery_codes = codes
         return codes
 
-    def get_folders(self):
+    def get_folders(self) -> list[Folder]:
+        """
+        Get the users recovery folders
+
+            Parameters:
+                self: Refers to the specific instance of the class
+
+            Returns:
+                codes (RecoveryCode[]): The list of folders
+        """
         conn, cursor = connect()
         cursor.execute(
             "SELECT folder_name FROM folders WHERE user_id = %s", (self.user_id,)
@@ -292,11 +356,19 @@ class User:
         self.folders = folders
         return folders
 
-    def disable_tfa(self):
+    def disable_tfa(self) -> None:
+        """
+        Disable a user's Two Factor Authentication
+
+            Parameters:
+                self: Refers to the specific instance of the class
+        """
+        # Clear the values already stored in the class
         self.tfa_enabled = False
         self.totp_secret = None
         self.recovery_codes = []
         conn, cursor = connect()
+        # Update in the database
         cursor.execute(
             """UPDATE users
                 SET tfa_enabled = %s, totp_secret = %s
@@ -304,25 +376,38 @@ class User:
             """,
             (False, None, self.user_id),
         )
+        # Delete corresponding recovery codes
         cursor.execute(
             """DELETE FROM recovery_codes WHERE user_id = %s""", (self.user_id,)
         )
         conn.commit()
         conn.close()
 
-    def enable_tfa(self, totp_secret, recovery_codes):
+    def enable_tfa(self, totp_secret: str, recovery_codes: list[str]) -> None:
+        """
+        Enables 2FA for a user
+
+            Parameters:
+                self: Refers to the specific instance of the class
+                totp_secret (str): The secret to add to the user
+                recovery_codes (str[]): The recovery codes to correspond to the user
+        """
         self.tfa_enabled = True
         self.totp_secret = totp_secret
         conn, cursor = connect()
+        # Update values in the database
         cursor.execute(
             """UPDATE users
                 SET tfa_enabled = %s, totp_secret = %s 
                 WHERE user_id = %s""",
             (True, totp_secret, self.user_id),
         )
+        # Add each recovery code to the database
         code_ids = []
         for code in recovery_codes:
+            # They are each hashed instead of stored in plain text
             hashed, salt = generate_hash(code)
+            # Assign each one a unique ID to form part of the primary key
             code_id = str(uuid.uuid4())
             code_ids.append(code_id)
             cursor.execute(
@@ -335,18 +420,31 @@ class User:
             RecoveryCode(self.user_id, code_id) for code_id in code_ids
         ]
 
-    def check_recovery_code(self, to_verify):
+    def check_recovery_code(self, to_verify: str) -> bool:
+        """
+        Checks if the user's entered recovery code is correct
+
+            Parameters:
+                self: Refers to the specific instance of the class
+                to_verify (str): The code to verify
+
+            Returns:
+                valid (bool): If the code is correct
+        """
         valid = False
         for code in self.recovery_codes:
+            # Checks against each individual code
             check = code.verify(to_verify)
             if check:
                 valid = True
+                # Delete the code on use so that it can't be used again
                 code.delete()
+                # Break as the other codes don't need to be checked again
                 break
         return valid
 
 
-def create_user(email, password):
+def create_user(email: str, password: str) -> User:
     """
     Adds a user to a database if they don't already exist
         Parameters:
@@ -385,13 +483,14 @@ def create_user(email, password):
     return User(email_address=email)
 
 
-def delete_user(user_id):
+def delete_user(user_id: str) -> bool:
     """
     Deletes a user from the database
         Parameters:
             user_id (str): The user ID to delete
     """
     # Delete user data and all data in other tables that is associated with that user
+    # The user's info has to be deleted from the tables that depend on it first to not cause an error
     conn, cursor = connect()
     cursor.execute(
         """DELETE FROM recovery_codes

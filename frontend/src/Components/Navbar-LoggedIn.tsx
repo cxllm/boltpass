@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { Link, useLocation } from "react-router";
 import { FaLightbulb, FaMoon } from "react-icons/fa6";
 
+// The navbar to use for when a user is logged in
 export default function NavigationLoggedIn(props: {
 	setDark: () => void;
 	dark: boolean;

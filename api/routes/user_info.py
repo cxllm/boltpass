@@ -16,6 +16,7 @@ user_info = Blueprint("user_info", __name__)
 
 @user_info.get("/api/user/<user_id>")
 def user_info_route(user_id):
+    # Route to get user info if the ID exists
     try:
         user = User(user_id=user_id)
         return jsonify(
@@ -37,6 +38,7 @@ def user_info_route(user_id):
 
 @user_info.get("/api/user/<user_id>/folders")
 def user_folders_route(user_id):
+    # Get all the user's folders if the user exists
     try:
         user = User(user_id=user_id)
         folders = [

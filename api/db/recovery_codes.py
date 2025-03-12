@@ -28,7 +28,7 @@ class RecoveryCode:
         (_, _, self.hashed, self.salt) = cursor.fetchone()
         conn.close()
 
-    def verify(self, code):
+    def verify(self, code: str) -> bool:
         """
         Verify if a recovery code entered is the right code
 
@@ -41,7 +41,7 @@ class RecoveryCode:
         """
         return verify_password(code, self.salt, self.hashed)
 
-    def delete(self):
+    def delete(self) -> None:
         """
         Deletes a recovery code
 

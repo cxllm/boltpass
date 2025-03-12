@@ -32,6 +32,7 @@ passwordRegex = "^(?=.*[0-9])(?=.*[A-Z])(?=.*[a-z])(?=.*[^0-9A-Za-z]).{8,}$"
 # Using POST to correspond to a CREATE command in SQL
 @user_management.post("/api/sign-up")
 def sign_up_route():
+    # Route to sign up a new user
     # get the post request data
     data = json.loads(request.data)
     # make sure that both the email and password are in the request field
@@ -85,7 +86,7 @@ def sign_up_route():
 # Using GET to correspond to a SELECT command in SQL
 @user_management.get("/api/login")
 def login_route():
-    # logs the user in
+    # Route to log the user in
     # get email and password from url query, and verifies if they have values
     email = request.args.get("email")
     password = request.args.get("password")
@@ -144,6 +145,8 @@ def login_route():
 
 @user_management.delete("/api/user/<user_id>")
 def delete_user_route(user_id):
+    # Route to delete a user account
+    # Password is required to fulfill this request
     password = request.args.get("password")
     if not user_id or not password:
         return jsonify(
@@ -153,6 +156,7 @@ def delete_user_route(user_id):
             }
         )
     try:
+        # Verify the user password
         user = User(user_id=user_id)
         if not user.verify_password(password):
             return jsonify(
@@ -162,6 +166,7 @@ def delete_user_route(user_id):
                 }
             )
         if user.tfa_enabled:
+            # Must enter 2fa code to verify
             totp_code = request.args.get("totp_code")
             recovery_code = request.args.get("recovery_code")
             if not totp_code and not recovery_code:
@@ -189,6 +194,7 @@ def delete_user_route(user_id):
                     )
 
         return jsonify({"success": delete_user(user_id)})
+    # Catch if user doesn't exist
     except InvalidUserIDError:
         return jsonify(
             {
@@ -320,7 +326,9 @@ def verify_user_email_route(user_id):
 
 @user_management.put("/api/user/<user_id>/password")
 def update_user_password_route(user_id):
+    # Route to update a user's password
     data = json.loads(request.data)
+    # Must supply both old and new password
     if not user_id or "old" not in data.keys() or "new" not in data.keys():
         return jsonify(
             {
@@ -329,6 +337,7 @@ def update_user_password_route(user_id):
             }
         )
     try:
+        # Ensure old password is correct first
         user = User(user_id=user_id)
         old = data["old"]
         new = data["new"]
@@ -339,9 +348,11 @@ def update_user_password_route(user_id):
                     "text": "The password entered is invalid",
                 }
             )
+        # Update after checking
         user.update_password(old, new)
         return jsonify({"success": True})
 
+    # Catch in case user ID is invalid
     except InvalidUserIDError:
         return jsonify(
             {

@@ -49,7 +49,7 @@ class Password:
         ) = data
         conn.close()
 
-    def decrypt(self, key: str) -> tuple[str]:
+    def decrypt(self, key: str) -> str:
         """
         Decrypt the password
 
@@ -174,7 +174,7 @@ class Password:
         username: str,
         website: str = None,
         totp_secret: str = None,
-    ):
+    ) -> tuple[str]:
         """
         Update the information associated with the password
 
@@ -208,7 +208,7 @@ class Password:
         ):
             pass
         else:
-            # Update the values that have been changed
+            # Update only the values that have been changed
             self.website = website if website else self.website
             self.name = name if name else self.name
             self.totp_secret = totp_secret if totp_secret else self.totp_secret
@@ -232,7 +232,7 @@ class Password:
             conn.close()
         return self.website, self.name, self.totp_secret, self.username
 
-    def delete(self):
+    def delete(self) -> bool:
         """
         Delete a password
 

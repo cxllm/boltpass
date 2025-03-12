@@ -4,6 +4,7 @@ import Logo from "../../../Components/Logo";
 import { useParams, useNavigate, Link } from "react-router";
 import { FaCopy, FaCheck } from "react-icons/fa6";
 import { Password } from "./Main";
+
 function ViewPassword(props: {
 	dark: boolean;
 	user: User;

@@ -19,7 +19,10 @@ from util.totp import verify
 
 @user_2fa.put("/api/user/<user_id>/2fa")
 def update_2fa_route(user_id):
+    # Route to update user's 2 Factor Authentication Settings
+    # User must enter password to access this route
     password = request.args.get("password")
+    # Get the request data which must have totp_secret and tfa_enabled in it
     data = json.loads(request.data)
     if (
         not password
@@ -33,6 +36,7 @@ def update_2fa_route(user_id):
             }
         )
     try:
+        # verify the password is correct
         user = User(user_id=user_id)
         if not user.verify_password(password):
             return jsonify(
@@ -43,6 +47,7 @@ def update_2fa_route(user_id):
             )
         else:
             if data["tfa_enabled"]:
+                # Add 2FA and the recovery codes codes
                 if not "codes" in data.keys():
                     return jsonify(
                         {
@@ -55,6 +60,7 @@ def update_2fa_route(user_id):
                 user.enable_tfa(totp_secret, recovery_codes)
                 return jsonify({"enabled": True})
             else:
+                # Disable it and verify that the TOTP code or recovery code entered is correct
                 totp_code = request.args.get("totp_code")
                 recovery_code = request.args.get("recovery_code")
                 if not totp_code and not recovery_code:
@@ -82,6 +88,7 @@ def update_2fa_route(user_id):
                         )
                 user.disable_tfa()
                 return jsonify({"enabled": False})
+    # Catch if user doesn't exist
     except InvalidUserIDError:
         return jsonify(
             {
@@ -93,6 +100,8 @@ def update_2fa_route(user_id):
 
 @user_2fa.get("/api/user/<user_id>/verify-recovery-code")
 def verify_recovery_code_route(user_id):
+    # User route to verify the recovery code
+    # Needs a recovery code and a password to be entered
     recovery_code = request.args.get("recovery_code")
     password = request.args.get("password")
     if not user_id or not recovery_code or not password:
@@ -103,6 +112,7 @@ def verify_recovery_code_route(user_id):
             }
         )
     try:
+        # Check if the password is correct
         user = User(user_id=user_id)
         if not user.verify_password(password):
             return jsonify(
@@ -111,7 +121,9 @@ def verify_recovery_code_route(user_id):
                     "text": "The password entered is invalid",
                 }
             )
+        # Check the recovery code
         return jsonify(user.check_recovery_code(recovery_code))
+    # Catch for if user doesn't exist
     except InvalidUserIDError:
         return jsonify(
             {

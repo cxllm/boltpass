@@ -3,11 +3,13 @@ import { User } from "../../../App";
 import Logo from "../../../Components/Logo";
 import { useNavigate } from "react-router";
 
+// Page to allow user to add a password to the database
 function AddPassword(props: {
 	dark: boolean;
 	user: User;
 	getKey: () => string;
 }) {
+	// Initialise all the states that need to be used
 	const [password, setPassword] = useState("");
 	const [username, setUsername] = useState("");
 	const [name, setName] = useState("");
@@ -18,6 +20,7 @@ function AddPassword(props: {
 	const [requestSent, setRequestSent] = useState(false);
 	const navigate = useNavigate();
 	const addPassword = () => {
+		// Post the backend to add a password
 		setError("Please wait");
 		if (!requestSent) {
 			setRequestSent(true);
@@ -34,8 +37,8 @@ function AddPassword(props: {
 			})
 				.then((r) => r.json())
 				.then((r) => {
+					// Check for an error and if it doesn't exist then send it to the password info page for the password that was just created
 					if (r.error) {
-						console.log(r.error);
 						setError("Internal server error");
 					} else {
 						return navigate(`/user/passwords/${r.password_id}`);
@@ -105,6 +108,7 @@ function AddPassword(props: {
 				onClick={() => {
 					addPassword();
 				}}
+				// password, username and name are all needed so don't let them submit until these are filled in
 				disabled={!password || !username || !name}
 			>
 				Add Password

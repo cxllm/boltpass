@@ -3,6 +3,7 @@ import { User } from "../../../App";
 import { useNavigate, Link, useParams } from "react-router";
 import Logo from "../../../Components/Logo";
 
+// Type for when the passwords are requested from the database
 export interface Password {
 	decrypted: string;
 	password_id: string;
@@ -14,13 +15,18 @@ export interface Password {
 	reused: number;
 	leaked: number;
 }
+
+// Page that shows all of the users passwords
 function Passwords(props: { dark: boolean; user: User; getKey: () => void }) {
+	// Folder name can be present if called from /user/passwords/folder/[folderName]
 	const { folderName } = useParams();
+	// Initialise states
 	const [passwords, setPasswords] = useState<Password[]>();
 	const [searchQuery, setSearchQuery] = useState("");
 	const [requestSent, setRequestSent] = useState(false);
 	const navigate = useNavigate();
 	const getPasswords = () => {
+		// Get the passwords from the database that correspond to this user
 		fetch(`/api/user/${props.user.user_id}/passwords?key=${props.getKey()}`)
 			.then((r) => r.json())
 			.then((r) => {
@@ -32,7 +38,9 @@ function Passwords(props: { dark: boolean; user: User; getKey: () => void }) {
 			});
 	};
 	const deleteFolder = () => {
+		// Deletes the folder from the database using a DELETE request
 		if (!requestSent) {
+			// Only sends a request if one hasn't already been sent
 			setRequestSent(true);
 			fetch(
 				`/api/user/${
@@ -45,19 +53,25 @@ function Passwords(props: { dark: boolean; user: User; getKey: () => void }) {
 					if (r.error) {
 						return;
 					} else if (r.success) {
+						// Bring back to main password page when deleted
 						return navigate("/user/passwords");
 					}
 				});
 		}
 	};
 	if (!passwords) getPasswords();
+	// Filter the results based on a search query
 	const filteredResults = passwords?.filter((p) => {
+		// If there is no search query or folder, return all items
 		if (!searchQuery && !folderName) {
 			return true;
-		} else if (folderName) {
+		}
+		// If there is a folder but no search query show all items in the folder
+		else if (folderName && !searchQuery) {
 			return p.folder_name == folderName;
 		}
 
+		// get the matching items
 		const s = searchQuery.toLowerCase();
 		if (folderName) {
 			return (

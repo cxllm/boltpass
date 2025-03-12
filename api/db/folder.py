@@ -89,7 +89,7 @@ class Folder:
         return passwords
 
 
-def create_folder(user_id, folder_name):
+def create_folder(user_id: str, folder_name: str) -> Folder:
     """
     Creates a new folder
 

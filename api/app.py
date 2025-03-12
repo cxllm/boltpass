@@ -15,6 +15,7 @@ from util.generate_password import (
 )
 from util.totp import verify as verify_totp, generate_totp, generate_code
 
+# using blueprinting instead of putting all routes in one file to make the file neater
 from routes.user_management import user_management
 from routes.user_info import user_info
 from routes.user_2fa import user_2fa

@@ -3,12 +3,12 @@ import { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router";
 import { FaLightbulb, FaMoon } from "react-icons/fa6";
 
+// The navbar to use for when a user is not logged in
 export default function Navigation(props: {
 	setDark: () => void;
 	dark: boolean;
 }) {
 	const location = useLocation();
-
 	// intialise the state with current pathname
 	const [pathname, setPathname] = useState(location.pathname);
 	// update pathname state when it path changes
