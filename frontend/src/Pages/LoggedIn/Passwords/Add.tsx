@@ -50,7 +50,20 @@ function AddPassword(props: {
 		<>
 			<Logo dark={props.dark} />
 			<h1>Add a Password</h1>
-			<form className="login">
+			{
+				// display any error
+				error ? <span className="red">{error}</span> : ""
+			}
+			<form
+				className="styled-form"
+				// allows the user to submit by pressing enter instead of pressing the button
+				onSubmit={(e) => {
+					e.preventDefault();
+					if (password && username && name) {
+						addPassword();
+					}
+				}}
+			>
 				<label>
 					Username <span className="red">(Required)</span>
 				</label>
@@ -103,17 +116,14 @@ function AddPassword(props: {
 					name="totp_secret"
 					onInput={(v) => setTotpSecret(v.currentTarget.value)}
 				/>
+				<button
+					type="submit"
+					// password, username and name are all needed so don't let them submit until these are filled in
+					disabled={!password || !username || !name}
+				>
+					Add Password
+				</button>
 			</form>
-			<button
-				onClick={() => {
-					addPassword();
-				}}
-				// password, username and name are all needed so don't let them submit until these are filled in
-				disabled={!password || !username || !name}
-			>
-				Add Password
-			</button>
-			{error ? <span className="red">{error}</span> : ""}
 		</>
 	);
 }

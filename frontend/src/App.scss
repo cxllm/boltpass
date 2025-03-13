@@ -65,17 +65,20 @@ body {
 		}
 
 		button:disabled {
+			// button for when it is not accessible
 			background-color: red;
 			color: #fff8;
 			cursor: not-allowed;
 		}
 
 		button.red-button {
+			// red button
 			background-color: red;
 		}
 	}
 
 	.nav {
+		// the styles for the nav bar
 		text-align: left;
 		font-family: var(--font);
 		height: 8vh;
@@ -83,6 +86,7 @@ body {
 		color: #fff;
 		background-color: var(--dark-blue);
 
+		// style based on active, hovered or normal
 		a {
 			color: #fffa !important;
 		}
@@ -96,7 +100,8 @@ body {
 		}
 	}
 
-	form.login {
+	form.styled-form {
+		// styles the form to not take up the whole width of the page
 		width: 50vw;
 		text-align: left;
 		margin-left: auto;
@@ -108,6 +113,7 @@ body {
 	input[type="password"],
 	input[type="email"],
 	input[type="number"] {
+		// creates a neater, streamlined look for the input boxes
 		width: 100%;
 		padding: 0.625rem 1.25rem;
 		margin: 0.5rem 0;
@@ -118,19 +124,19 @@ body {
 		background-color: var(--dark-blue);
 		color: var(--white);
 	}
-	input .search {
-		background-image: url("http://i47.tinypic.com/r02vbq.png");
-	}
 
 	label {
+		// so the label isn't next to the input
 		display: block;
 	}
 
 	input::placeholder {
+		// The colour of the text inside the input before you type
 		color: #fff7;
 	}
 
 	input:read-only {
+		// grey out a read only input
 		background-color: var(--gray);
 		border: var(--gray);
 	}
@@ -140,7 +146,6 @@ body {
 		width: fit-content;
 		margin-left: auto;
 		margin-right: auto;
-
 		label {
 			font-size: 1.5rem;
 			font-weight: 400;
@@ -163,6 +168,7 @@ body {
 		margin: 0.5rem;
 	}
 	div.buttons {
+		// Makes buttons go next to each other
 		display: flex;
 		width: fit-content;
 		margin-left: auto;
@@ -171,15 +177,18 @@ body {
 			margin: 0.2rem;
 		}
 	}
+
 	div.grid {
+		// grid layout for having 2 or more divs on the same row
 		display: grid;
 		color: white;
-		grid-template-columns: 1fr 1fr; /* fraction*/
+		grid-template-columns: 1fr 1fr;
 		text-align: justify;
 		p {
 			margin-bottom: 0.25rem;
 		}
 		div {
+			// styles for the div to have some contrast against the page
 			color: white !important;
 			margin: 0.25rem;
 			padding: 0.625rem;
@@ -189,22 +198,28 @@ body {
 				width: 100%;
 			}
 		}
+
 		div.full-length {
+			// a in the grid that takes up all the length
 			grid-column: 1 / -1;
 		}
 		div.right {
+			// So there is no margin on the right for the right-most div
 			margin-right: 0;
 		}
 		div.left {
+			// So there is no margin on the left for the left-most div
 			margin-left: 0;
 		}
 		div.image-center {
+			// centers an image within a div
 			padding: 0;
 			background-color: #fff0;
 			text-align: center !important;
 		}
 	}
 	img.qrcode {
+		// styles for the QR code
 		text-align: center;
 		width: 14rem;
 		margin-left: auto;
@@ -230,26 +245,26 @@ body {
 			display: none;
 		}
 
-		form.login {
+		// makes the form longer
+		form.styled-form {
 			width: 90vw;
 		}
-
 		div.grid {
+			// makes the grid only show one element per row
 			grid-template-columns: 1fr !important;
 
 			div {
 				margin: 0.25rem 0;
 			}
-
+			// as there is only one div per row, the right and left margins are not needed
 			div.right {
 				margin-right: 0;
 			}
-
 			div.left {
 				margin-left: 0;
 			}
 		}
-
+		// make QR code take up most of the screen
 		img.qrcode {
 			width: 50vw;
 		}
@@ -263,11 +278,13 @@ body {
 	.green {
 		color: var(--light-green);
 	}
+	hr {
+		border-top: 2px dashed white;
+	}
 }
 .app.light {
 	// light mode theme
 	background-color: #fff;
-	color: var(--dark-bg);
 	.green {
 		color: var(--dark-green);
 	}
@@ -281,17 +298,22 @@ body {
 			background-color: var(--dark-bg);
 		}
 	}
+	hr {
+		border-top: 2px dashed var(--dark-bg);
+	}
 }
 
 a,
 a:not([href]),
 a:not([class]) {
+	// styles for links, including links without a destination but a function instead
 	color: var(--light-blue) !important;
 	cursor: pointer !important;
 	text-decoration: none !important;
 }
 
 .logo {
+	// logo styling
 	height: 10rem;
 	padding: 1.5rem;
 	margin-left: auto;
@@ -306,6 +328,11 @@ a:not([class]) {
 	color: var(--red);
 }
 
+.justify {
+	text-align: justify;
+}
+
+// default p and h1 styles
 h1 {
 	text-align: center;
 	font-weight: 800;

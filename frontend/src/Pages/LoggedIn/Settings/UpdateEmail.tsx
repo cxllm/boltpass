@@ -3,8 +3,9 @@ import Logo from "../../../Components/Logo";
 import { useState } from "react";
 import { emailRegex } from "../../../regex.tsx";
 
-// Currently a placeholder page until I create the real one.
+// Page to allow user to update their email
 function UpdateEmail(props: { dark: boolean; user: User; logout: () => void }) {
+	// initialise state
 	const [email, setEmail] = useState("");
 	const [emailVerification, setEmailVerification] = useState("");
 	const [password, setPassword] = useState("");
@@ -12,6 +13,7 @@ function UpdateEmail(props: { dark: boolean; user: User; logout: () => void }) {
 	const [success, setSuccess] = useState(false);
 	const [loggedOut, setLoggedOut] = useState(false);
 	const updateEmail = () => {
+		// Update email using a PUT request to the server
 		setError("Please wait...");
 		fetch(`/api/user/${props.user.user_id}/update-email?password=${password}`, {
 			method: "PUT",
@@ -23,6 +25,7 @@ function UpdateEmail(props: { dark: boolean; user: User; logout: () => void }) {
 			.then((r) => {
 				if (r.error) {
 					switch (r.error) {
+						// Let user know if their password is wrong or if the email is already being used by someone else
 						case "PASSWORD_NOT_CORRECT":
 							setError("Incorrect password entered!");
 							break;
@@ -47,6 +50,7 @@ function UpdateEmail(props: { dark: boolean; user: User; logout: () => void }) {
 			<Logo dark={props.dark} />
 			<h1>Update Email Address</h1>
 			{success ? (
+				// display a message explaining what will happen now the email has changed
 				<>
 					<h2 className="green">
 						Your email address has been changed to {email}. You will be logged out in
@@ -69,7 +73,21 @@ function UpdateEmail(props: { dark: boolean; user: User; logout: () => void }) {
 				</>
 			) : (
 				<>
-					<form className="login">
+					<form
+						className="styled-form"
+						// allows the user to submit by pressing enter instead of pressing the button
+						onSubmit={(e) => {
+							e.preventDefault();
+							if (
+								emailRegex.test(email) &&
+								email === emailVerification &&
+								password &&
+								props.user.email != email
+							) {
+								updateEmail();
+							}
+						}}
+					>
 						<label>Enter your new email (this will be verified): </label>
 						<input
 							type="email"
@@ -121,18 +139,18 @@ function UpdateEmail(props: { dark: boolean; user: User; logout: () => void }) {
 							required
 							onInput={(v) => setPassword(v.currentTarget.value)}
 						/>
+						<button
+							type="submit"
+							disabled={
+								// only allow the user to sign up if the emails match, are valid and a password has been entered
+								!(emailRegex.test(email) && email === emailVerification) ||
+								!password ||
+								email == props.user.email
+							}
+						>
+							Change Email Address
+						</button>
 					</form>
-					<button
-						onClick={updateEmail}
-						disabled={
-							// only allow the user to sign up if the emails match, are valid and a password has been entered
-							!(emailRegex.test(email) && email === emailVerification) ||
-							!password ||
-							email == props.user.email
-						}
-					>
-						Change Email Address
-					</button>
 					{error ? <span className="red">{error}</span> : ""}{" "}
 				</>
 			)}

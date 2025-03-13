@@ -16,6 +16,7 @@ function EditPassword(props: {
 	const [passwordInfo, setPasswordInfo] = useState<Password>();
 	const [error, setError] = useState("");
 	const [requestSent, setRequestSent] = useState(false);
+	const [initialPass, setInitialPass] = useState("");
 	const navigate = useNavigate();
 	const getPassword = () => {
 		// Gets the password information
@@ -40,6 +41,7 @@ function EditPassword(props: {
 					// Get info if no error
 					setError("");
 					setPasswordInfo(r);
+					setInitialPass(r.decrypted);
 				}
 			});
 	};
@@ -81,10 +83,27 @@ function EditPassword(props: {
 				{"<<"} Back to Password Details
 			</Link>
 			{
+				// display any error
+				error ? <span className="red">{error}</span> : ""
+			}
+			{
 				// only show this if the password was found
 				passwordInfo ? (
 					<>
-						<form className="login">
+						<form
+							className="styled-form"
+							// allows the user to submit by pressing enter instead of pressing the button
+							onSubmit={(e) => {
+								e.preventDefault();
+								if (
+									passwordInfo.decrypted &&
+									passwordInfo.username &&
+									passwordInfo.name
+								) {
+									editPassword();
+								}
+							}}
+						>
 							<label>
 								Username <span className="red">(Required)</span>
 							</label>
@@ -103,10 +122,9 @@ function EditPassword(props: {
 							<input
 								type="password"
 								placeholder="Enter your password"
-								required
 								name="password"
 								onInput={(v) => {
-									passwordInfo.decrypted = v.currentTarget.value;
+									passwordInfo.decrypted = v.currentTarget.value || initialPass;
 									setPasswordInfo(passwordInfo);
 								}}
 							/>
@@ -157,22 +175,21 @@ function EditPassword(props: {
 									setPasswordInfo(passwordInfo);
 								}}
 							/>
+							<button
+								type="submit"
+								// ensure all the required fields are present
+								disabled={
+									!passwordInfo.decrypted || !passwordInfo.username || !passwordInfo.name
+								}
+							>
+								Update Password
+							</button>
 						</form>
-						<button
-							onClick={editPassword}
-							// ensure all the required fields are present
-							disabled={
-								!passwordInfo.decrypted || !passwordInfo.username || !passwordInfo.name
-							}
-						>
-							Update Password
-						</button>
 					</>
 				) : (
 					<p>Loading...</p>
 				)
 			}
-			{error ? <span className="red">{error}</span> : ""}
 		</>
 	);
 }

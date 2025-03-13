@@ -10,6 +10,7 @@ function ViewPassword(props: {
 	user: User;
 	getKey: () => string;
 }) {
+	// Get password ID and initliase states
 	const { passwordID } = useParams();
 	const [passwordInfo, setPasswordInfo] = useState<Password>();
 	const [error, setError] = useState("");
@@ -21,12 +22,15 @@ function ViewPassword(props: {
 	const [deletePressed, setDeletePressed] = useState(0);
 	const navigate = useNavigate();
 	const getCodeValidTime = () => {
+		// Gets the amount of time that a TOTP code is valid for
+		// Takes the amount of seconds away from :00 or :30
 		return 30 - (Math.floor(Date.now() / 1000) % 30);
 	};
 	const [timeLeftOnCode, setTimeLeftOnCode] = useState<number>(
 		getCodeValidTime()
 	);
 	const getPassword = () => {
+		// get the password info from the database
 		fetch(
 			`/api/user/${
 				props.user.user_id
@@ -44,11 +48,13 @@ function ViewPassword(props: {
 							break;
 					}
 				} else {
+					// if there was no error set the password info
 					setPasswordInfo(r);
 				}
 			});
 	};
 	const deletePassword = () => {
+		// delete the password using a DELETE request to the backend
 		fetch(
 			`/api/user/${
 				props.user.user_id
@@ -62,25 +68,31 @@ function ViewPassword(props: {
 				if (r.error) {
 					setError("Internal server error");
 				} else {
+					// redirect back to home page for passwords if it was successful
 					if (r) {
 						navigate("/user/passwords");
 					}
 				}
 			});
 	};
-	const get2FACode = async () => {
+	const get2FACode = () => {
+		// Get the 2FA code that corresponds with the password (if applicable)
 		if (!passwordInfo?.totp_secret) {
 			return null;
 		}
-		const data = await (
-			await fetch(`/api/generate-totp-code?secret=${passwordInfo.totp_secret}`)
-		).json();
-		setTfaCode(data);
-		setCopiedCode(false);
+
+		fetch(`/api/generate-totp-code?secret=${passwordInfo.totp_secret}`)
+			.then((r) => r.json())
+			.then((r) => {
+				setTfaCode(r);
+				setCopiedCode(false);
+			});
 	};
 	const copy = (value: string) => {
+		// copy a value to the user's clipboard
 		navigator.clipboard.writeText(value);
 	};
+	// get the password as the password loads
 	if (!passwordInfo) getPassword();
 	// generate code on loading the website
 	if (passwordInfo?.totp_secret && !tfaCode) get2FACode();
@@ -138,7 +150,11 @@ function ViewPassword(props: {
 								>
 									{copiedPass ? <FaCheck /> : <FaCopy />}
 								</a>{" "}
-								<a onClick={() => setShow(!show)}>{show ? "Hide" : "Show"}</a>
+								<a // show/hide the password when pressed
+									onClick={() => setShow(!show)}
+								>
+									{show ? "Hide" : "Show"}
+								</a>
 							</p>
 							<p>
 								2FA Code:{" "}
@@ -180,7 +196,8 @@ function ViewPassword(props: {
 						<div className="right">
 							<h2>Security</h2>
 							<p>
-								{passwordInfo.leaked > 0 || passwordInfo.reused > 1 ? (
+								{passwordInfo.leaked > 0 || passwordInfo.reused > 0 ? (
+									// let the user know if their info has been leaked or if they have reused it
 									<span className="red">
 										You should change your password! See below for details
 									</span>
@@ -211,6 +228,7 @@ function ViewPassword(props: {
 								)}{" "}
 							</p>
 							{passwordInfo.reused > 0 ? (
+								// allow the user to see which passwords use the same password as this one
 								<p>
 									To see which other entries use this password, click{" "}
 									<Link to={`/user/passwords/${passwordID}/reused`}>here</Link>
@@ -234,17 +252,21 @@ function ViewPassword(props: {
 								setDeletePressed(deletePressed + 1);
 							}}
 						>
-							{deletePressed == 1
-								? "Are you sure? Press again to confirm"
-								: deletePressed == 0
-								? "Delete this password"
-								: "Deleting password..."}
+							{
+								// only allow the password to be deleted after confirmation twice, reducing chances of accidental deletion
+								deletePressed == 1
+									? "Are you sure? Press again to confirm"
+									: deletePressed == 0
+									? "Delete this password"
+									: "Deleting password..."
+							}
 						</button>
 						<br />
 					</div>
 				</>
 			) : (
-				<p>{error ? <span className="error">error</span> : "Loading..."}</p>
+				// display any error
+				<p>{error ? <span className="error">{error}</span> : "Loading..."}</p>
 			)}
 		</>
 	);

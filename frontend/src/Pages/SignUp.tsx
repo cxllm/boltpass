@@ -59,7 +59,20 @@ function SignUp(props: {
 			<p>
 				Already have an account? <Link to="/login">Login</Link>
 			</p>
-			<form className="login">
+			<form
+				className="styled-form"
+				onSubmit={(e) => {
+					e.preventDefault();
+					if (
+						emailRegex.test(email) &&
+						email === emailVerification &&
+						passwordRegex.test(password) &&
+						password === passwordVerification
+					) {
+						signUp();
+					}
+				}}
+			>
 				<label>Email (this will be verified): </label>
 				<input
 					type="email"
@@ -178,18 +191,18 @@ function SignUp(props: {
 						""
 					)
 				}
+				<button
+					type="submit"
+					disabled={
+						// only allow the user to sign up if the passwords and emails match and are both valid
+						!(emailRegex.test(email) && email === emailVerification) ||
+						!(passwordRegex.test(password) && password === passwordVerification)
+					}
+				>
+					Sign Up
+				</button>
 			</form>
 			{error ? <span className="red">{error}</span> : ""}
-			<button
-				onClick={signUp}
-				disabled={
-					// only allow the user to sign up if the passwords and emails match and are both valid
-					!(emailRegex.test(email) && email === emailVerification) ||
-					!(passwordRegex.test(password) && password === passwordVerification)
-				}
-			>
-				Sign Up
-			</button>
 		</>
 	);
 }

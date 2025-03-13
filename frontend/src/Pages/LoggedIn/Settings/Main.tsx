@@ -2,7 +2,7 @@ import { User } from "../../../App";
 import { useNavigate } from "react-router";
 import Logo from "../../../Components/Logo";
 
-// Currently a placeholder settings page until I create the real one.
+// The settings page which displays account information and provides links to change these settings
 function Settings(props: { dark: boolean; user: User }) {
 	const navigate = useNavigate();
 	return (

@@ -76,6 +76,7 @@ function ReusedPasswords(props: {
 								</h2>
 								<div className="grid">
 									{filteredPasswords.map((p, i) => (
+										// Add a new element for each password in the results
 										<Link to={`/user/passwords/${p.password_id}`}>
 											<div className={i % 2 == 1 ? "right" : "left"}>
 												<h2>{p.name}</h2>
@@ -99,6 +100,7 @@ function ReusedPasswords(props: {
 					}
 				</>
 			) : (
+				// display any error
 				<p>{error ? <span className="error">{error}</span> : "Loading..."}</p>
 			)}
 		</>

@@ -123,6 +123,7 @@ function Passwords(props: { dark: boolean; user: User; getKey: () => void }) {
 					{filteredResults && filteredResults.length >= 1 ? (
 						<div className="grid">
 							{filteredResults.map((p: Password, i) => (
+								// Create a new element for each password
 								<Link to={`/user/passwords/${p.password_id}`}>
 									<div className={i % 2 == 1 ? "right" : "left"}>
 										<h2>{p.name}</h2>
@@ -138,6 +139,7 @@ function Passwords(props: { dark: boolean; user: User; getKey: () => void }) {
 							))}{" "}
 						</div>
 					) : (
+						// display an error if nothing found
 						<span className="red">
 							{folderName ? "Folder does not exist!" : "No results found!"}
 						</span>

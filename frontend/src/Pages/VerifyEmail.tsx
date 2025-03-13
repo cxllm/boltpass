@@ -1,5 +1,5 @@
 import Logo from "../Components/Logo";
-// Currently a placeholder home page until I create the real one.
+// Telling user to verify email after first signing up
 function VerifyEmail(props: { dark: boolean }) {
 	return (
 		<>

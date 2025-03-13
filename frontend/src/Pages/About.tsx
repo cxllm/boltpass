@@ -1,19 +1,21 @@
 import Logo from "../Components/Logo";
-// Currently a placeholder home page until I create the real one.
+
+// Provides information about the service and why users should trust it
 function About(props: { dark: boolean }) {
 	return (
 		<>
 			<Logo dark={props.dark} />
 			<h1>Information About BoltPass</h1>
 			<h2>What is BoltPass?</h2>
-			<p>
+			<p className="justify">
 				BoltPass is a secure password manager that stores your passwords for you so
 				you only have to remember one, your password to access this site. This
 				allows you to use unique, secure passwords for each one of your online
 				accounts, so if one gets hacked, the others won't be at risk.
 			</p>
+			<hr />
 			<h2>Why should I trust BoltPass?</h2>
-			<p>
+			<p className="justify">
 				Studies have shown that a large amount of Internet users don't trust
 				password managers because of the amount of sensitive information you entrust
 				in these services. Below you can find some information about how BoltPass

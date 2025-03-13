@@ -1,3 +1,4 @@
+// Stored in a separate file as they are accessed multiple times, so they can be used again
 // Regex to verify if an email is valid
 const emailRegex =
 	/^[a-zA-Z0-9.!#$%&’*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)+$/;

@@ -70,7 +70,21 @@ function UpdatePassword(props: {
 			) : (
 				<>
 					{error ? <h2 className="red">{error}</h2> : ""}
-					<form className="login">
+					<form
+						className="styled-form"
+						// allows the user to submit by pressing enter instead of pressing the button
+						onSubmit={(e) => {
+							e.preventDefault();
+							if (
+								passwordRegex.test(newPassword) &&
+								newPassword === passwordVerification &&
+								oldPassword &&
+								oldPassword != newPassword
+							) {
+								updatePassword();
+							}
+						}}
+					>
 						<label>Enter your old password: </label>
 						<input
 							type="password"
@@ -159,20 +173,20 @@ function UpdatePassword(props: {
 								""
 							)
 						}
+						<button
+							type="submit"
+							disabled={
+								// only allow the user to sign up if the emails match, are valid and a password has been entered
+								!(
+									passwordRegex.test(newPassword) && newPassword === passwordVerification
+								) ||
+								!oldPassword ||
+								oldPassword == newPassword
+							}
+						>
+							Change Password
+						</button>
 					</form>
-					<button
-						onClick={updatePassword}
-						disabled={
-							// only allow the user to sign up if the emails match, are valid and a password has been entered
-							!(
-								passwordRegex.test(newPassword) && newPassword === passwordVerification
-							) ||
-							!oldPassword ||
-							oldPassword == newPassword
-						}
-					>
-						Change Password
-					</button>
 				</>
 			)}
 		</>

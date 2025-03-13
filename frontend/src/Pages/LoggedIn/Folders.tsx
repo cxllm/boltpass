@@ -8,10 +8,13 @@ export interface Folder {
 	user_id: string;
 	items: number;
 }
+// Shows the users their folders
 function Folders(props: { dark: boolean; user: User }) {
+	// Initialise states
 	const [folders, setFolders] = useState<Folder[]>();
 	const [searchQuery, setSearchQuery] = useState("");
 	const getFolders = () => {
+		// Get the folders from the database
 		fetch(`/api/user/${props.user.user_id}/folders`)
 			.then((r) => r.json())
 			.then((r) => {
@@ -23,6 +26,7 @@ function Folders(props: { dark: boolean; user: User }) {
 			});
 	};
 	if (!folders) getFolders();
+	// get folders to match search query
 	const filteredResults = folders?.filter((f) => {
 		if (!searchQuery) {
 			return true;
@@ -52,6 +56,7 @@ function Folders(props: { dark: boolean; user: User }) {
 					{filteredResults && filteredResults.length >= 1 ? (
 						<div className="grid">
 							{filteredResults.map((f: Folder, i) => (
+								// create an element for each folder that matches
 								<Link to={`/user/passwords/folder/${f.folder_name}`}>
 									<div className={i % 2 == 1 ? "right" : "left"}>
 										<h2>{f.folder_name}</h2>

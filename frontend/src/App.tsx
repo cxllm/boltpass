@@ -115,6 +115,7 @@ function App() {
 		return <Navigate to="/" />;
 	};
 	const getKey = () => {
+		// gets the encryption key from the local storage and logs out if one is not present
 		const key = getItemFromLocalStorage("key");
 		if (!key) {
 			logOut();
@@ -194,6 +195,7 @@ function App() {
 								}
 							/>
 							<Route
+								// dynamic route allowing the page to be generated differently based on the folder name
 								path="/user/passwords/folder/:folderName"
 								element={
 									loggedIn && user ? (
@@ -214,6 +216,7 @@ function App() {
 								}
 							/>
 							<Route
+								// dynamic route allowing the page to be generated differently based on the password ID
 								path="/user/passwords/:passwordID"
 								element={
 									loggedIn && user ? (
@@ -293,6 +296,7 @@ function App() {
 									)
 								}
 							/>
+							{/* A catch for any page that wasn't found */}
 							<Route path="*" element=<NotFound dark={dark} /> />
 						</Routes>
 					</div>
