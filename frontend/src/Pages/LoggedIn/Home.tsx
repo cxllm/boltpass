@@ -2,7 +2,7 @@ import { User } from "../../App";
 import Logo from "../../Components/Logo";
 import { Link } from "react-router";
 
-// Currently a placeholder home page until I create the real one.
+// Logged in home page
 function LoggedInHome(props: { dark: boolean; user: User }) {
 	return (
 		<>

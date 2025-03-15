@@ -1,6 +1,6 @@
 import { Link } from "react-router";
 import Logo from "../Components/Logo";
-// Currently a placeholder home page until I create the real one.
+// Home page
 function Home(props: { dark: boolean }) {
 	return (
 		<>
