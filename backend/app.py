@@ -131,16 +131,24 @@ def verify_totp_route():
 # Gets the code at this point in time for a specific secret
 @app.get("/api/generate-totp-code")
 def generate_totp_code_route():
-    # Gets secret from url query and ensures it has a value
-    secret = request.args.get("secret")
-    if not secret:
+    try:
+        # Gets secret from url query and ensures it has a value
+        secret = request.args.get("secret")
+        if not secret:
+            return jsonify(
+                {
+                    "error": "MISSING_DATA",
+                    "text": "Need a secret",
+                }
+            )
+        return jsonify(generate_code(secret))
+    except:
         return jsonify(
             {
-                "error": "MISSING_DATA",
-                "text": "Need a secret",
+                "error": "INVALID_TOTP_SECRET",
+                "text": "Secret entered is invalid",
             }
         )
-    return jsonify(generate_code(secret))
 
 
 # generate TOTP config
