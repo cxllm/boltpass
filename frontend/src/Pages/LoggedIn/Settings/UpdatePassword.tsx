@@ -58,6 +58,11 @@ function UpdatePassword(props: {
 				This operation may take a long time depending on how many passwords you have
 				stored as every password must be updated and re-encrypted
 			</p>
+			<p className="red">
+				If you forget your password, you will not be able to reset it due to the
+				nature of how passwords are stored, so make sure it is something memorable
+				or that you keep it somewhere safe.
+			</p>
 			{success ? (
 				<>
 					<h2 className="green">
