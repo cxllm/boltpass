@@ -59,6 +59,11 @@ function SignUp(props: {
 			<p>
 				Already have an account? <Link to="/login">Login</Link>
 			</p>
+			<p className="red">
+				If you forgot your password, you will not be able to reset it due to the
+				nature of how passwords are stored, so make sure it is something memorable
+				or that you keep it somewhere safe.
+			</p>
 			<form
 				className="styled-form"
 				onSubmit={(e) => {
