@@ -20,7 +20,11 @@ function Login(props: {
 	const navigate = useNavigate();
 	const login = () => {
 		setError("Please wait...");
-		fetch(`/api/login?email=${email}&password=${password}`)
+		fetch(
+			`/api/login?email=${encodeURIComponent(email)}&password=${encodeURIComponent(
+				password
+			)}`
+		)
 			.then((r) => r.json())
 			.then((r) => {
 				if (r.error) {
