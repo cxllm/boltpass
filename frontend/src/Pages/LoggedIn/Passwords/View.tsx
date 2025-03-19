@@ -84,8 +84,12 @@ function ViewPassword(props: {
 		fetch(`/api/generate-totp-code?secret=${passwordInfo.totp_secret}`)
 			.then((r) => r.json())
 			.then((r) => {
-				setTfaCode(r);
-				setCopiedCode(false);
+				if (r.error) {
+					setTfaCode("Invalid TOTP Secret entered");
+				} else {
+					setTfaCode(r);
+					setCopiedCode(false);
+				}
 			});
 	};
 	const copy = (value: string) => {

@@ -308,22 +308,6 @@ def verify_recovery_code_route(user_id):
         )
 
 
-@user_management.get("/api/user/<user_id>/verify-user-email")
-def verify_user_email_route(user_id):
-    email = request.args.get("email")
-    user = User(user_id=user_id)
-    if user.email != email:
-        return jsonify(
-            {
-                "error": "EMAIL_DOES_NOT_MATCH",
-                "text": "email does not match with the one being verified",
-            }
-        )
-    if not user.email_verified:
-        user.verify_email()
-    return redirect("/email-verified")
-
-
 @user_management.put("/api/user/<user_id>/password")
 def update_user_password_route(user_id):
     # Route to update a user's password
