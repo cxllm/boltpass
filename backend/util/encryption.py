@@ -23,7 +23,7 @@ def derive_key(
     """
     kdf = PBKDF2HMAC(
         # using a different type of hashing to avoid clashes
-        algorithm=hashes.MD5(),
+        algorithm=hashes.SHA512(),
         length=key_length,
         salt=bytes.fromhex(salt),
         iterations=iterations,
