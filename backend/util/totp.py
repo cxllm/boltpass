@@ -8,7 +8,7 @@ import pyotp
 import qrcode
 
 
-def generate_recovery_codes(codes_to_generate: int = 8, length: int = 8):
+def generate_recovery_codes(codes_to_generate: int = 8, length: int = 8) -> list[str]:
     """
     Generates a random string of recovery codes
 
@@ -30,7 +30,7 @@ def generate_recovery_codes(codes_to_generate: int = 8, length: int = 8):
     return codes
 
 
-def generate_totp(name):
+def generate_totp(name: str) -> tuple[str]:
     """
     Generates a random TOTP combination
 
@@ -76,7 +76,7 @@ def generate_totp(name):
     return secret_key, encoded_img, generate_recovery_codes()
 
 
-def verify(secret_key, code):
+def verify(secret_key: str, code: str) -> bool:
     """
     Verifies a code against a TOTP secret for right now or 30 seconds ago
 
