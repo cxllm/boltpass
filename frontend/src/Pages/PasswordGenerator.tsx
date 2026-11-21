@@ -86,7 +86,11 @@ function PasswordGenerator(props: { dark: boolean }) {
 				// if the password hasn't been generated yet, don't show anything
 				password ? ( // if it has, show the below
 					<>
-						<h2 className="generator">Generated Password: {password}</h2>
+						<h2 className="generator">
+							Generated Password:
+							<br />
+							<code className="generated-password">{password}</code>
+						</h2>
 						<button
 							// button to copy the password to the clipboard
 							onClick={() => {

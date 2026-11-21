@@ -1,19 +1,29 @@
-@import url("https://fonts.googleapis.com/css2?family=Inter&display=swap"); // importing the font used for the website
+@import url("https://fonts.googleapis.com/css2?family=Funnel+Display:wght@300..800&family=JetBrains+Mono&display=swap"); // importing the font used for the website
 :root {
 	--dark-blue: #13587c;
-	--dark-bg: #202124;
+	--dark-bg: #1a1a1a;
 	--light-blue: #01abfe;
 	--light-green: #0f6;
 	--dark-green: #0b3;
 	--red: #f03;
 	--gray: #575758;
-	--font: Inter; // setting default colours and font, allowing for them to be easily changed as they don't need to be repeated
+	--font: "Funnel Display"; // setting default colours and font, allowing for them to be easily changed as they don't need to be repeated
 
 	// the settings below form part of the default CSS configuration when you set up a React application as they ensure that
 	// the website can be rendered on all devices and browsers, if they don't support things such as outside fonts
-	font-family: var(--font), -apple-system, BlinkMacSystemFont, "Segoe UI",
-		"Roboto", "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans",
-		"Helvetica Neue", sans-serif; // ensuring there will always be a fallback font in case the imported one doesn't work
+	font-family:
+		var(--font),
+		-apple-system,
+		BlinkMacSystemFont,
+		"Segoe UI",
+		"Roboto",
+		"Oxygen",
+		"Ubuntu",
+		"Cantarell",
+		"Fira Sans",
+		"Droid Sans",
+		"Helvetica Neue",
+		sans-serif; // ensuring there will always be a fallback font in case the imported one doesn't work
 	line-height: 1.5;
 	font-weight: 400; // default font settings
 
@@ -166,6 +176,12 @@ body {
 	h2.generator {
 		// fixes margins on the password generator page
 		margin: 0.5rem;
+		code.generated-password {
+			overflow-wrap: anywhere; /* break only when the line is full */
+			word-break: break-all; /* ...and break at any character, not just after punctuation */
+			font-family: "JetBrains Mono", monospace;
+			color: inherit;
+		}
 	}
 	div.buttons {
 		// Makes buttons go next to each other
