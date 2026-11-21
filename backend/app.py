@@ -118,6 +118,8 @@ def verify_totp_route():
     # Gets code and secret from url query and ensures they have a value
     code = request.args.get("code")
     secret = request.args.get("secret")
+    print(code)
+    print(secret)
     if not code and not secret:
         return jsonify(
             {

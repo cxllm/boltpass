@@ -70,7 +70,7 @@ function Update2FA(props: { dark: boolean; user: User; logout: () => void }) {
 		// enable 2FA using a PUT request
 		setError("Please wait...");
 		fetch(`/api/verify-totp?code=${totpCode}&secret=${tfaConfig?.secret}`)
-			.then((r) => r.json)
+			.then((r) => r.json())
 			.then((r) => {
 				// verify totp code first
 				if (!r) {
