@@ -51,7 +51,7 @@ def generate_totp(name: str) -> tuple[str]:
     totp = pyotp.TOTP(secret_key)
 
     # generate a uri to enter into a qr code for scanning by apps such as authy or google auth
-    uri = totp.provisioning_uri(name, issuer_name="BoltPass")
+    uri = totp.provisioning_uri(name=name, issuer_name="BoltPass")
 
     qr = qrcode.QRCode(
         version=1,  # size of qr code
