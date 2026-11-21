@@ -12,7 +12,7 @@ load_dotenv()
 email = os.getenv("EMAIL_USER")
 password = os.getenv("EMAIL_PASSWORD")
 smtp_server = os.getenv("SMTP_SERVER")
-domain = os.getenv("DOMAIN")
+base_url = os.getenv("BASE_URL")
 
 
 def send_email(
@@ -58,9 +58,7 @@ def verification_email(user_email: str, user_id: str):
             user_email (str): The user's email address
             user_id (str): The user's ID
     """
-    verification_link = (
-        f"https://{domain}/api/user/{user_id}/verify-email?email={user_email}"
-    )
+    verification_link = f"{base_url}/api/user/{user_id}/verify-email?email={user_email}"
     # Uses a template that is filled in dynamically
     html = f"""
 <html>

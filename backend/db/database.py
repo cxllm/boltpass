@@ -5,26 +5,15 @@ from dotenv import load_dotenv
 
 def connect():
     """
-    Connect to the database
+    Connect to the database#
 
         Returns
             conn: The connection to the database
             cursor: The cursor for the database
     """
     load_dotenv()
-    host = os.getenv("HOST")
-    port = os.getenv("PORT")
-    user = os.getenv("USER")
-    dbname = os.getenv("DB")
-    password = os.getenv("PASSWORD")
-
-    with psycopg2.connect(
-        host=host,
-        port=port,
-        dbname=dbname,
-        user=user,
-        password=password,
-    ) as conn:
+    host = os.getenv("POSTGRES_URI")
+    with psycopg2.connect(host) as conn:
         return conn, conn.cursor()
 
 

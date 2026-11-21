@@ -203,6 +203,7 @@ def delete_user_route(user_id):
             }
         )
 
+
 @user_management.get("/api/user/<user_id>/verify-recovery-code")
 def verify_recovery_code_route(user_id):
     recovery_code = request.args.get("recovery_code")
